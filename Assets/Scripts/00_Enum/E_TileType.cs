@@ -3,7 +3,7 @@ public enum E_TileType
     Plane,
     Grass,
     Water,
-    Mountin,
+    Mountain,
     Road,
     Obstacle,
     E_TILETYPE_MAX
