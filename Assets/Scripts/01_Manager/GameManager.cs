@@ -37,6 +37,7 @@ public class GameManager : MonoBehaviour
     {
         InitializePooling();
         LoadStage();
+        TurnManager.Instance.StartTurn();
     }
 
     /// <summary>
