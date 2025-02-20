@@ -1,0 +1,34 @@
+{
+  "stageId": 2,
+  "stageName": "관도대전",
+  "width": 15,
+  "height": 15,
+  "tileLegend": {
+    "G": { "type": "Grass", "walkable": true },
+    "R": { "type": "Road", "walkable": true },
+    "W": { "type": "Water", "walkable": false },
+    "M": { "type": "Mountain", "walkable": false }
+  },
+  "tileMap": [
+    "GGGGGGGGGGGGGGG",
+    "GRRRRRRRRRGGGGG",
+    "GWWWWWWWWRGGGGG",
+    "GRRRRRRRRRGGGGG",
+    "GGGGGGGGGGGGGGG",
+    "GGGGGRRRRGGGGGG",
+    "GGGGGRRRRGGGGGG",
+    "GGGGGGGGGGGGGGG",
+    "GGGGMGGGGGGGGGG",
+    "GGGGMGGGGGGGGGG",
+    "GGGGGGGGGGGGGGG",
+    "GRRRRRRRRRGGGGG",
+    "GWWWWWWWWRGGGGG",
+    "GRRRRRRRRRGGGGG",
+    "GGGGGGGGGGGGGGG"
+  ],
+  "units": [
+    { "unitTypeId": 1, "startX": 3, "startY": 3, "unitTeam": "Ally" },
+    { "unitTypeId": 2, "startX": 7, "startY": 8, "unitTeam": "Enemy" },
+    { "unitTypeId": 3, "startX": 9, "startY": 10, "unitTeam": "Enemy" }
+  ]
+}
