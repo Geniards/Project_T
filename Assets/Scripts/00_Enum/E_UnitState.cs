@@ -9,6 +9,6 @@ public enum E_UnitState
    Attack,
    Hitted,
    Dead,
-   Complelete,
+   Complete,
    E_UNITSTATE_MAX
 }
