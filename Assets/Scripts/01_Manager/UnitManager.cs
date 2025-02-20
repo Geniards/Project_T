@@ -76,15 +76,12 @@ public class UnitManager : MonoBehaviour
         unitDictionary[spawnData.unitTypeId].Add(unit);
         Debug.Log($"UnitManager {spawnData.unitTypeId} count : {unitDictionary[spawnData.unitTypeId].Count}");
 
-        // ÆÀ µî·Ï;
-        unit.unitTeam = (E_UnitTeam)spawnData.unitTeam;
-
         // ÆÀ¿¡ µû¸¥ À¯´Ö¸®½ºÆ® Ãß°¡
-        if(unit.unitTeam == E_UnitTeam.Ally)
+        if(unit.unitData.unitTeam == E_UnitTeam.Ally)
         {
             playerUnit.Add(unit);
         }
-        else if(unit.unitTeam == E_UnitTeam.Enemy)
+        else if(unit.unitData.unitTeam == E_UnitTeam.Enemy)
         {
             enemyUnit.Add(unit);
         }

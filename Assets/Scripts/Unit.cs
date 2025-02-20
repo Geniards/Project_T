@@ -8,8 +8,6 @@ public class Unit : MonoBehaviour
     public UnitData unitData; // 유닛 기본 정보
     public Tile currentTile; // 유닛이 현재 위치한 타일 위치
 
-    // 유닛 팀 정보
-    public E_UnitTeam unitTeam;
     // 유닛 행동 상태 정보
     public E_UnitState unitState;
 
@@ -20,11 +18,11 @@ public class Unit : MonoBehaviour
     /// <param name="spawnData">유닛 초기화 정보</param>
     public void Initialize(UnitSpawnData spawnData)
     {
-        unitTeam = (E_UnitTeam)spawnData.unitTeam;
         unitState = E_UnitState.Idle;
 
         // UnitDatabase에서 unitId를 기반으로 데이터를 가져옴
         unitData = UnitDatabase.Instance.GetUnitDataById(spawnData.unitTypeId);
+        unitData.unitTeam = (E_UnitTeam)spawnData.unitTeam;
 
         if (unitData == null)
         {
