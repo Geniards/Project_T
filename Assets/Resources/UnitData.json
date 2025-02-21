@@ -9,9 +9,9 @@
       "defense": 30,
       "level": 5,
       "exp": 500,
-      "rangeInfo": {
-        "Emperor": { "attackRange": 1, "moveRange": 5 }
-      }
+      "unitTypeNum": 1,
+      "attackRange": 1,
+      "moveRange": 5
     },
     {
       "unitId": 2,
@@ -22,9 +22,9 @@
       "defense": 10,
       "level": 2,
       "exp": 100,
-      "rangeInfo": {
-        "Soldier": { "attackRange": 1, "moveRange": 3 }
-      }
+      "unitTypeNum": 2,
+      "attackRange": 1,
+      "moveRange": 3
     },
     {
       "unitId": 3,
@@ -35,9 +35,9 @@
       "defense": 5,
       "level": 3,
       "exp": 200,
-      "rangeInfo": {
-        "Archer": { "attackRange": 3, "moveRange": 2 }
-      }
+      "unitTypeNum": 3,
+      "attackRange": 3,
+      "moveRange": 2
     }
   ]
 }

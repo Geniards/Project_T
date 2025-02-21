@@ -28,9 +28,11 @@ public class UnitDatabase : MonoBehaviour
     private void LoadUnitData()
     {
         UnitDataCollection dataCollection = JsonUtility.FromJson<UnitDataCollection>(unitJsonFile.text);
+        
         foreach (var unitData in dataCollection.units)
         {
             unitDataDictionary[unitData.unitId] = unitData;
+            unitDataDictionary[unitData.unitId].IntToUnitType();
         }
         Debug.Log($"[UnitDatabase] 모든 유닛 데이터 로드 완료 - 총 {unitDataDictionary.Count}개");
     }

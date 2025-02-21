@@ -17,6 +17,14 @@ public class UnitData
     public float exp;
     public float maxExp;
 
-    // TODO : 딕셔너리 Json 사용가능하게 파싱해서 정리.
-    public Dictionary<E_UnitType, UnitInfo> rangeInfo;
+    // 유닛 클래스 정보
+    public E_UnitType unitType;
+    public int unitTypeNum;
+    public int attackRange;
+    public int moveRange;
+
+    public void IntToUnitType()
+    {
+        unitType = (E_UnitType)unitTypeNum;
+    }
 }
