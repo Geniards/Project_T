@@ -172,4 +172,26 @@ public class UnitManager : MonoBehaviour
         playerUnit.Clear();
         enemyUnit.Clear();
     }
+
+    /// <summary>
+    /// 특정 위치에 존재하는 유닛 반환
+    /// </summary>
+    /// <param name="position">유닛 존재 여부를 반환할 타일 위치</param>
+    /// <returns></returns>
+    public Unit GetUnitAtPosition(Vector2Int position)
+    {
+        // 해당 위치의 유닛 반환
+        foreach (var unitList in unitDictionary.Values)
+        {
+            foreach (var unit in unitList)
+            {
+                if (unit.currentTile && unit.currentTile.vec2IntPos == position)
+                {
+                    return unit;
+                }
+            }
+        }
+        // 유닛이 없으면 null 반환
+        return null;
+    }
 }

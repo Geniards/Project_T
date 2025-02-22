@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -20,6 +18,10 @@ public class GameManager : MonoBehaviour
     [Header("JSON Data")]
     public TextAsset stageJsonFile;
     public StageData currentStageData;
+
+    [Header("선택된 유닛")]
+    private Unit selectedUnit;
+    private Tile selectedUnitTile;
 
     private void Awake()
     {
@@ -105,6 +107,78 @@ public class GameManager : MonoBehaviour
     {
         GridManager.Instance.ResetGrid();
         UnitManager.Instance.ResetUnits();
+    }
+
+    /// <summary>
+    /// 마우스 클릭시 처리
+    /// </summary>
+    /// <param name="worldPos"></param>
+    public void HandleClick(Vector2 worldPos)
+    {
+        Vector2Int gridPos = new Vector2Int(Mathf.RoundToInt(worldPos.x), Mathf.RoundToInt(worldPos.y));
+        Tile clickedTile = GridManager.Instance.GetTile(gridPos);
+
+        if (clickedTile)
+        {
+            Unit clickedUnit = UnitManager.Instance.GetUnitAtPosition(clickedTile.vec2IntPos);
+
+            // 선택된 유닛 재선택시 해제
+            if (selectedUnit && clickedTile == selectedUnitTile)
+            {
+                DeselectUnit();
+                return;
+            }
+
+            if(clickedUnit && clickedUnit.unitData.unitTeam == E_UnitTeam.Ally)
+            {
+                SelectUnit(clickedUnit);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 유닛 선택
+    /// </summary>
+    /// <param name="unit"></param>
+    private void SelectUnit(Unit unit)
+    {
+        if (selectedUnit)
+        {
+            selectedUnitTile.ClearHighlight();
+        }
+
+        selectedUnit = unit;
+        selectedUnitTile = unit.currentTile;
+        selectedUnitTile.HighlightTile(new Color(1f, 1f, 0f, 0.3f));
+    }
+
+    /// <summary>
+    /// 유닛 선택 해제
+    /// </summary>
+    private void DeselectUnit()
+    {
+        if (selectedUnit)
+        {
+            selectedUnitTile.ClearHighlight();
+            selectedUnit = null;
+            selectedUnitTile = null;
+        }
+    }
+
+    /// <summary>
+    /// 특정 타일이 선택된 유닛이 점유하고 있는지 확인
+    /// </summary>
+    public bool IsTileOccupiedBySelectedUnit(Tile tile)
+    {
+        return selectedUnitTile == tile;
+    }
+
+    /// <summary>
+    /// 현재 선택된 유닛이 있는 타일 반환
+    /// </summary>
+    public Tile GetSelectedUnitTile()
+    {
+        return selectedUnitTile;
     }
 
     // TODO : 다음 스테이지 로드

@@ -12,6 +12,8 @@ public class GridManager : MonoBehaviour
     // 해당 좌표의 값에 따른 타일 검색
     public Dictionary<Vector2Int, Tile> tileDictionary = new Dictionary<Vector2Int, Tile>();
 
+    private Tile prevHighlightedTile;
+
     private void Awake()
     {
         if(!Instance)
@@ -78,5 +80,30 @@ public class GridManager : MonoBehaviour
             GameManager.Instance.ReturnTile(tile);
         }
         tileDictionary.Clear();
+    }
+
+    /// <summary>
+    /// 마우스 오버 시 하이라이트
+    /// </summary>
+    public void HandleMouseOver(Vector2 worldPos)
+    {
+        Vector2Int gridPos = new Vector2Int(Mathf.RoundToInt(worldPos.x), Mathf.RoundToInt(worldPos.y));
+        Tile hoveredTile = GetTile(gridPos);
+
+        // 이전 하이라이트 제거 (단, 선택된 유닛 타일은 유지)
+        if (prevHighlightedTile && prevHighlightedTile != GameManager.Instance.GetSelectedUnitTile())
+        {
+            prevHighlightedTile.ClearHighlight();
+        }
+
+        if (hoveredTile)
+        {
+            // 선택된 유닛이 있는 타일이면 하이라이트 덮어씌우지 않음
+            if (hoveredTile != GameManager.Instance.GetSelectedUnitTile())
+            {
+                hoveredTile.HighlightTile(new Color(1f, 1f, 1f, 0.1f)); // 연한 흰색 하이라이트
+            }
+            prevHighlightedTile = hoveredTile;
+        }
     }
 }
