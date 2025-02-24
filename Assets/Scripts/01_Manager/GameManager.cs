@@ -145,11 +145,13 @@ public class GameManager : MonoBehaviour
         if (selectedUnit)
         {
             selectedUnitTile.ClearHighlight();
+            GridManager.Instance.ClearWalkableTiles();
         }
 
         selectedUnit = unit;
         selectedUnitTile = unit.currentTile;
         selectedUnitTile.HighlightTile(new Color(1f, 1f, 0f, 0.3f));
+        GridManager.Instance.FindWalkableTiles(unit);
     }
 
     /// <summary>
@@ -160,6 +162,7 @@ public class GameManager : MonoBehaviour
         if (selectedUnit)
         {
             selectedUnitTile.ClearHighlight();
+            GridManager.Instance.ClearWalkableTiles();
             selectedUnit = null;
             selectedUnitTile = null;
         }

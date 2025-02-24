@@ -15,6 +15,7 @@ public class Tile : MonoBehaviour
     // 타일 하이라이트
     private SpriteRenderer spriteRenderer;
     private Color defaultColor = new Color(1, 1, 1, 0.5f); // 투명색
+    private Color currentColor;
 
 
     private void Awake()
@@ -43,7 +44,16 @@ public class Tile : MonoBehaviour
     /// <param name="color">하이라이트에 넣을 색상</param>
     public void HighlightTile(Color color)
     {
+        currentColor = color;
         spriteRenderer.color = color;
+    }
+
+    /// <summary>
+    /// 현재 적용된 하이라이트 색상으로 복원
+    /// </summary>
+    public void RestoreHighlight()
+    {
+        spriteRenderer.color = currentColor;
     }
 
     /// <summary>
@@ -51,6 +61,7 @@ public class Tile : MonoBehaviour
     /// </summary>
     public void ClearHighlight()
     {
+        currentColor = defaultColor;
         spriteRenderer.color = defaultColor;
     }
 
