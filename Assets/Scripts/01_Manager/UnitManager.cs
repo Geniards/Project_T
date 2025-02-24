@@ -194,4 +194,37 @@ public class UnitManager : MonoBehaviour
         // À¯´ÖÀÌ ¾øÀ¸¸é null ¹ÝÈ¯
         return null;
     }
+
+    // ÁÖº¯ À¯´Ö Å½»ö
+    public Unit FindNearestUnit(Unit unitList)
+    {
+        Unit nearestUnit = null;
+        int minDistance = int.MaxValue;
+
+        if (unitList.unitData.unitTeam != E_UnitTeam.Ally)
+        {
+            foreach (Unit playerUnit in playerUnit)
+            {
+                int distance = (int)Vector2Int.Distance(unitList.currentTile.vec2IntPos, playerUnit.currentTile.vec2IntPos);
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    nearestUnit = playerUnit;
+                }
+            }
+        }
+        else
+        {
+            foreach (Unit enemyUnit in enemyUnit)
+            {
+                int distance = (int)Vector2Int.Distance(unitList.currentTile.vec2IntPos, enemyUnit.currentTile.vec2IntPos);
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    nearestUnit = enemyUnit;
+                }
+            }
+        }
+        return nearestUnit;
+    }
 }
