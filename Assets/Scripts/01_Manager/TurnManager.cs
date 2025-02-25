@@ -25,6 +25,11 @@ public class TurnManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        StartTurn();
+    }
+
     private void Update()
     {
         if(Input.GetKeyDown(KeyCode.S))
@@ -40,6 +45,11 @@ public class TurnManager : MonoBehaviour
                 Debug.Log("아군 턴 완료");
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            GridManager.Instance.ShowHiggLight();
+        }
     }
 
     /// <summary>
@@ -49,24 +59,27 @@ public class TurnManager : MonoBehaviour
     {
         if (isPlayerTurn)
         {
-            Debug.Log("아군 턴 시작.");
-            playerUnits = UnitManager.Instance.GetPlayerUnits();
-            foreach (Unit unit in playerUnits)
-            {
-                unit.unitState = E_UnitState.Idle;
-            }
+            Debug.Log("아군 턴 시작!");
+            StartPlayerTurn();
         }
         else
         {
-            Debug.Log("적군 턴 시작.");
-            // 큐 초기화 후 시작.
-            enemyUnits.Clear();
-            foreach (Unit unit in UnitManager.Instance.GetEnemyUnits())
-            {
-                unit.unitState = E_UnitState.Idle;
-                enemyUnits.Enqueue(unit);
-            }
+            Debug.Log("적군 턴 시작!");
             StartCoroutine(EnemyTurnRoutine());
+        }
+    }
+
+    /// <summary>
+    /// 플레이어 턴 시작
+    /// </summary>
+    private void StartPlayerTurn()
+    {
+        Debug.Log("아군 턴 시작.");
+        playerUnits = UnitManager.Instance.GetPlayerUnits();
+
+        foreach (Unit unit in playerUnits)
+        {
+            unit.unitState = E_UnitState.Idle;
         }
     }
 
@@ -95,15 +108,21 @@ public class TurnManager : MonoBehaviour
     /// <returns></returns>
     private IEnumerator EnemyTurnRoutine()
     {
-        while(enemyUnits.Count > 0)
+        enemyUnits.Clear();
+
+        foreach (Unit unit in UnitManager.Instance.GetEnemyUnits())
         {
-            Unit enemy = enemyUnits.Dequeue();
-            yield return new WaitForSeconds(1f);
-            enemy.unitState = E_UnitState.Complete;
-            Debug.Log("적유닛 행동완료.");
+            unit.unitState = E_UnitState.Idle;
+            enemyUnits.Enqueue(unit);
         }
 
-        EndTurn();
+        while (enemyUnits.Count > 0)
+        {
+            Unit enemy = enemyUnits.Dequeue();
+            yield return StartCoroutine(enemy.TakeTurn());
+
+            Debug.Log("적유닛 행동완료.");
+        }
     }
 
     private void EndTurn()
@@ -111,5 +130,16 @@ public class TurnManager : MonoBehaviour
         // 턴 변경
         isPlayerTurn = !isPlayerTurn;
         StartTurn();
+    }
+
+    /// <summary>
+    /// 적군 유닛이 자신의 턴을 완료했을 때 호출
+    /// </summary>
+    public void OnUnitTurnCompleted()
+    {
+        if (!isPlayerTurn && enemyUnits.Count == 0)
+        {
+            EndTurn();
+        }
     }
 }
