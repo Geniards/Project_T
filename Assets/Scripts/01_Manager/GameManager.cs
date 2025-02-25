@@ -126,112 +126,53 @@ public class GameManager : MonoBehaviour
         {
             Unit clickedUnit = UnitManager.Instance.GetUnitAtPosition(clickedTile.vec2IntPos);
 
+            // 이미 행동을 완료한 유닛이라면 클릭 무시
+            if (selectedUnit && selectedUnit.unitState == E_UnitState.Complete)
+            {
+                Debug.Log("이미 턴을 종료한 유닛입니다.");
+                return;
+            }
+
             // 선택된 유닛 재선택시 해제
             if (selectedUnit && clickedTile == selectedUnitTile)
             {
-                DeselectUnit();
+                GridManager.Instance.ClearWalkableTiles();
+                GridManager.Instance.FindAttackableTiles(selectedUnit);
+                if (selectedUnit.FindAttackableUnit())
+                {
+                    GridManager.Instance.ShowHiggLight();
+                    return;
+                }
+
+                selectedUnit.Deselect();
+                selectedUnit = null;
+                selectedUnitTile = null;
                 return;
             }
             else if (selectedUnit && GridManager.Instance.IsWalkableTile(clickedTile))
             {
-                MoveUnit(selectedUnit, clickedTile);
+                selectedUnit.MoveTo(clickedTile);
+
+                return;
             }
 
+            // 선택된 유닛이 적을 공격 가능한 경우
+            if (selectedUnit && clickedUnit && selectedUnit.unitData.unitTeam != clickedUnit.unitData.unitTeam)
+            {
+                selectedUnit.Attack(clickedUnit);
+                return;
+            }
+
+            // 선택된 유닛이 없는 경우
             if (clickedUnit && clickedUnit.unitData.unitTeam == E_UnitTeam.Ally && clickedUnit.unitState == E_UnitState.Idle)
             {
-                SelectUnit(clickedUnit);
+                if (selectedUnit) selectedUnit.Deselect();
+                selectedUnit = clickedUnit;
+                selectedUnitTile = selectedUnit.currentTile;
+                selectedUnit.Select();
+
             }
         }
-    }
-
-    /// <summary>
-    /// 유닛 선택
-    /// </summary>
-    /// <param name="unit"></param>
-    private void SelectUnit(Unit unit)
-    {
-        if (selectedUnit)
-        {
-            selectedUnitTile.ClearHighlight();
-            GridManager.Instance.ClearWalkableTiles();
-        }
-
-        selectedUnit = unit;
-        selectedUnitTile = unit.currentTile;
-        selectedUnitTile.HighlightTile(new Color(1f, 1f, 0f, 0.3f));
-        GridManager.Instance.FindWalkableTiles(unit);
-    }
-
-    /// <summary>
-    /// 유닛 선택 해제
-    /// </summary>
-    private void DeselectUnit()
-    {
-        if (selectedUnit)
-        {
-            selectedUnitTile.ClearHighlight();
-            GridManager.Instance.ClearWalkableTiles();
-            selectedUnit = null;
-            selectedUnitTile = null;
-            Debug.Log("디버그 유닛 선택 해제");
-        }
-    }
-
-    public void MoveUnit(Unit unit, Tile targetTile)
-    {
-#if UNITY_EDITOR
-       // if(!targetTile.isOccupied)
-           // Debug.Log($"유닛 {unit.unitData.unitId} 이동 {targetTile.vec2IntPos}");
-       // else
-           // Debug.Log($"유닛이 해당 위치 {targetTile.vec2IntPos} 에 존재합니다. ");
-#endif
-
-        // 이동 위치가 벗어난 경우 이동가능 범위의 최대 위치로 이동하기
-        // A*로 이동경로를 저장 후 이동가능 범위에서의 최대 위치로 이동
-        Tile moveTile = GridManager.Instance.FindNearestReachableTile(unit, targetTile);
-        List<Tile> path = GridManager.Instance.FindPathAStar(unit.currentTile, moveTile);
-
-#if UNITY_EDITOR
-        //foreach (Tile tile in path)
-        //{
-        //    Debug.Log($"A* 경로 {tile.vec2IntPos}");
-        //}
-#endif
-        if (path.Count > 0)
-        {
-            StartCoroutine(MoveUnitAlongPath(unit, path));
-        }
-    }
-
-    /// <summary>
-    /// 유닛을 A* 알고리즘으로 찾은 경로를 따라 이동
-    /// </summary>
-    /// <param name="unit"></param>
-    /// <param name="path"></param>
-    /// <returns></returns>
-    private IEnumerator MoveUnitAlongPath(Unit unit, List<Tile> path)
-    {
-#if UNITY_EDITOR
-        //Debug.Log($"A* 이동 경로 {path.Count-1}");
-        //Debug.Log($"유닛 이동  {unit.unitData.moveRange}");
-#endif
-
-        foreach (Tile tile in path)
-        {
-            unit.transform.position = tile.transform.position;
-            yield return new WaitForSeconds(0.2f);
-        }
-
-        unit.currentTile.isOccupied = false;
-        unit.SetCurrentTile(path.Last());
-        unit.currentTile.isOccupied = true;
-
-        // 이동 경로의 마지막이 유닛의 이동 가능 범위의 최대치일 경우 턴 종료
-        if (unit.currentTile == path.Last())
-        {
-            unit.unitState = E_UnitState.Complete;
-        }
-        DeselectUnit();
     }
 
     /// <summary>
