@@ -17,6 +17,8 @@ public class UnitData
     public float exp;
     public float maxExp;
 
+    public int attackPower;
+
     // 유닛 클래스 정보
     public E_UnitType unitType;
     public int unitTypeNum;
