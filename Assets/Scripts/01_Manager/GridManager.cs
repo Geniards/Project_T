@@ -17,6 +17,9 @@ public class GridManager : MonoBehaviour
     private List<Tile> walkableTiles = new List<Tile>();
     private Tile prevHighlightedTile;
 
+    // 공격가능한 타일리스트
+    public List<Tile> attackableTiles = new List<Tile>();
+
     private void Awake()
     {
         if(!Instance)
@@ -339,5 +342,57 @@ public class GridManager : MonoBehaviour
         }
 
         return walkableTiles;
+    }
+
+    /// <summary>
+    /// 공격 가능한 타일을 찾고 하이라이트 표시
+    /// </summary>
+    /// <param name="unit"></param>
+    public void FindAttackableTiles(Unit unit, bool isHighlight = false)
+    {
+        attackableTiles.Clear();
+
+        foreach (Vector2Int direction in new Vector2Int[] { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right })
+        {
+            Vector2Int attackTilePos = unit.currentTile.vec2IntPos + direction;
+            Tile attackTile = GetTile(attackTilePos);
+
+            if (attackTile != null)
+            {
+                attackableTiles.Add(attackTile);
+                
+                if (isHighlight)
+                    attackTile.HighlightTile(new Color(1f, 0f, 0f, 0.3f)); // 빨간색 하이라이트
+#if UNITY_EDITOR
+                //Debug.Log($"[공격 가능] {unit.unitData.unitId} -> {attackTile.vec2IntPos}");
+#endif
+            }
+        }
+    }
+
+    // 공격범위 하이라이트
+    public void ShowHiggLight()
+    {
+        if (attackableTiles.Count == 0)
+            Debug.Log("공격범위 없음");
+
+        foreach (Tile tile in attackableTiles)
+        {
+            tile.HighlightTile(new Color(1f, 0f, 0f, 0.3f));
+        }
+
+
+    }
+
+    /// <summary>
+    /// 공격 가능한 타일 하이라이트 초기화
+    /// </summary>
+    public void ClearAttackableTiles()
+    {
+        foreach (Tile tile in attackableTiles)
+        {
+            tile.ClearHighlight();
+        }
+        attackableTiles.Clear();
     }
 }
