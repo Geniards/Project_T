@@ -57,6 +57,7 @@ public class TurnManager : MonoBehaviour
     /// </summary>
     public void StartTurn()
     {
+        GridManager.Instance.ClearAttackableTiles();
         if (isPlayerTurn)
         {
             Debug.Log("아군 턴 시작!");

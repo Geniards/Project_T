@@ -46,6 +46,11 @@ public class GameManager : MonoBehaviour
         TurnManager.Instance.StartTurn();
     }
 
+    private void Update()
+    {
+        ResultGame();
+    }
+
     /// <summary>
     /// 오브젝트 풀링 초기화
     /// </summary>
@@ -141,12 +146,11 @@ public class GameManager : MonoBehaviour
                 if (selectedUnit.FindAttackableUnit())
                 {
                     GridManager.Instance.ShowHiggLight();
-                    return;
                 }
-
-                selectedUnit.Deselect();
-                selectedUnit = null;
-                selectedUnitTile = null;
+                else
+                {
+                    Debug.Log("공격 가능한 유닛이 없음 - 대기 상태 유지");
+                }
                 return;
             }
             else if (selectedUnit && GridManager.Instance.IsWalkableTile(clickedTile))
@@ -160,6 +164,7 @@ public class GameManager : MonoBehaviour
             if (selectedUnit && clickedUnit && selectedUnit.unitData.unitTeam != clickedUnit.unitData.unitTeam)
             {
                 selectedUnit.Attack(clickedUnit);
+                GridManager.Instance.ClearAttackableTiles();
                 return;
             }
 
@@ -189,6 +194,14 @@ public class GameManager : MonoBehaviour
     public Tile GetSelectedUnitTile()
     {
         return selectedUnitTile;
+    }
+
+    private void ResultGame()
+    {
+        if (UnitManager.Instance.GetEnemyUnits().Count == 0)
+            Debug.Log("승리!");
+        else if (UnitManager.Instance.GetAllUnits().Count == 0)
+            Debug.Log("패배!");
     }
 
     // TODO : 다음 스테이지 로드

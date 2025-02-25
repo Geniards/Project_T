@@ -53,7 +53,7 @@ public class Unit : MonoBehaviour
         isSelected = false;
         currentTile.ClearHighlight();
         GridManager.Instance.ClearWalkableTiles();
-        GridManager.Instance.ClearAttackableTiles();
+        //GridManager.Instance.ClearAttackableTiles();
     }
 
     /// <summary>
@@ -239,6 +239,7 @@ public class Unit : MonoBehaviour
     private void Die()
     {
         Debug.Log($"{unitData.unitId} »ç¸Á!");
+        currentTile.isOccupied = false;
         UnitManager.Instance.RemoveUnit(this);
     }
 }

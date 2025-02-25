@@ -61,6 +61,7 @@ public class UnitManager : MonoBehaviour
     {
         // 오브젝트 풀에서 유닛 가져오기
         Unit unit = GameManager.Instance.GetUnit();
+        Debug.Log($"Spawndata는 무엇일까여? {spawnData}");
         unit.Initialize(spawnData);
         unit.transform.position = tile.transform.position;
 
