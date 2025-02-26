@@ -25,11 +25,6 @@ public class TurnManager : MonoBehaviour
         }
     }
 
-    private void Start()
-    {
-        StartTurn();
-    }
-
     private void Update()
     {
         if(Input.GetKeyDown(KeyCode.S))
@@ -48,7 +43,7 @@ public class TurnManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.A))
         {
-            GridManager.Instance.ShowHiggLight();
+            GridManager.Instance.ShowHighLight();
         }
     }
 
@@ -75,7 +70,6 @@ public class TurnManager : MonoBehaviour
     /// </summary>
     private void StartPlayerTurn()
     {
-        Debug.Log("아군 턴 시작.");
         playerUnits = UnitManager.Instance.GetPlayerUnits();
 
         foreach (Unit unit in playerUnits)
