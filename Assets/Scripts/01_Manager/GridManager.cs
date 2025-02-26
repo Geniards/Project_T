@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GridManager : MonoBehaviour
@@ -59,6 +60,9 @@ public class GridManager : MonoBehaviour
                     tile.SetTilePosition(position);
                     tile.SetTileProperties(tileInfo.walkable, Enum.Parse<E_TileType>(tileInfo.type));
 
+                    if (!tile.isWalkable)
+                        tile.defaultColor = new Color(0, 0, 01f);
+
                     tileDictionary[position] = tile;
                 }
             }
@@ -96,7 +100,7 @@ public class GridManager : MonoBehaviour
         Vector2Int gridPos = new Vector2Int(Mathf.RoundToInt(worldPos.x), Mathf.RoundToInt(worldPos.y));
         Tile hoveredTile = GetTile(gridPos);
 #if UNITY_EDITOR
-        //Debug.Log($"마우스 위치 [{gridPos}]");
+        Debug.Log($"마우스 위치 [{gridPos}]");
 #endif
 
         // 이전 하이라이트 제거 (단, 선택된 유닛 타일은 유지)
@@ -290,11 +294,14 @@ public class GridManager : MonoBehaviour
         Tile bestTile = null;
         int minDistance = int.MaxValue;
 
+        Vector2Int[] directions = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
+
         // BFS를 통해 이동 가능한 타일들을 가져옴
         List<Tile> reachableTiles = FindWalkableTilesWithoutHighlight(unit);
 
         foreach (Tile tile in reachableTiles)
         {
+            if (tile.isOccupied) continue; // 유닛이 점유한 타일 제외
             int distance = Heuristic(tile, targetTile);
             if (distance < minDistance)
             {
@@ -350,28 +357,46 @@ public class GridManager : MonoBehaviour
     /// <param name="unit"></param>
     public void FindAttackableTiles(Unit unit, bool isHighlight = false)
     {
-        attackableTiles.Clear();
+        // 0. 이동 가능한 하이라이트 초기화
+        ClearAttackableTiles();
 
-        foreach (Vector2Int direction in new Vector2Int[] { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right })
+        // 1. Queue 초기화
+        Queue<Tile> queue = new Queue<Tile>();
+        Dictionary<Tile, int> distanceMap = new Dictionary<Tile, int>();
+
+        // 2. 시작 타일을 큐에 넣고 거리 0으로 설정
+        Tile startTile = unit.currentTile;
+        queue.Enqueue(startTile);
+        distanceMap[startTile] = 0;
+
+        // 3. 큐가 빌 때까지 반복
+        while (queue.Count > 0)
         {
-            Vector2Int attackTilePos = unit.currentTile.vec2IntPos + direction;
-            Tile attackTile = GetTile(attackTilePos);
+            Tile currentTile = queue.Dequeue();
+            int currentDistance = distanceMap[currentTile];
 
-            if (attackTile != null)
+            if (currentDistance >= unit.unitData.attackRange) continue;
+
+            // 상하좌우 타일을 검사하여 이동 가능한 타일을 큐에 넣음
+            foreach (Vector2Int direction in new Vector2Int[] { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right })
             {
-                attackableTiles.Add(attackTile);
-                
-                if (isHighlight)
-                    attackTile.HighlightTile(new Color(1f, 0f, 0f, 0.3f)); // 빨간색 하이라이트
-#if UNITY_EDITOR
-                //Debug.Log($"[공격 가능] {unit.unitData.unitId} -> {attackTile.vec2IntPos}");
-#endif
+                Vector2Int neighborPos = currentTile.vec2IntPos + direction;
+                Tile nextTile = GetTile(neighborPos);
+
+                // 이동 가능한 타일이고, 아직 방문하지 않은 타일이고 유닛이 해당 타일에 존재하지 않는다면 큐에 넣음
+                if (nextTile && nextTile.isWalkable && !distanceMap.ContainsKey(nextTile))
+                {
+                    queue.Enqueue(nextTile);
+                    distanceMap[nextTile] = currentDistance + 1;
+                    attackableTiles.Add(nextTile);
+                }
             }
         }
+
     }
 
     // 공격범위 하이라이트
-    public void ShowHiggLight()
+    public void ShowHighLight()
     {
         if (attackableTiles.Count == 0)
             Debug.Log("공격범위 없음");
