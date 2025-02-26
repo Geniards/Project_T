@@ -1,8 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 public class GameManager : MonoBehaviour
 {
@@ -27,6 +23,7 @@ public class GameManager : MonoBehaviour
     private Unit selectedUnit;
     private Tile selectedUnitTile;
 
+    public bool isAutoBattle = false; // 아군 자동 전투 여부
     private void Awake()
     {
         if(!Instance)
@@ -49,6 +46,13 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
         ResultGame();
+
+        // 자동 전투 토글
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            isAutoBattle = !isAutoBattle;
+            Debug.Log($"자동 전투 모드: {(isAutoBattle ? "ON" : "OFF")}");
+        }
     }
 
     /// <summary>
@@ -141,14 +145,16 @@ public class GameManager : MonoBehaviour
             // 선택된 유닛 재선택시 해제
             if (selectedUnit && clickedTile == selectedUnitTile)
             {
+                selectedUnit.Deselect();
                 GridManager.Instance.ClearWalkableTiles();
                 GridManager.Instance.FindAttackableTiles(selectedUnit);
                 if (selectedUnit.FindAttackableUnit())
                 {
-                    GridManager.Instance.ShowHiggLight();
+                    GridManager.Instance.ShowHighLight();
                 }
                 else
                 {
+                    selectedUnit = null;
                     Debug.Log("공격 가능한 유닛이 없음 - 대기 상태 유지");
                 }
                 return;
@@ -165,10 +171,11 @@ public class GameManager : MonoBehaviour
             {
                 selectedUnit.Attack(clickedUnit);
                 GridManager.Instance.ClearAttackableTiles();
+                selectedUnit = null;
                 return;
             }
 
-            // 선택된 유닛이 없는 경우
+            // 선택된 유닛이 없는 경우(유닛 선택 부분)
             if (clickedUnit && clickedUnit.unitData.unitTeam == E_UnitTeam.Ally && clickedUnit.unitState == E_UnitState.Idle)
             {
                 if (selectedUnit) selectedUnit.Deselect();
@@ -200,7 +207,7 @@ public class GameManager : MonoBehaviour
     {
         if (UnitManager.Instance.GetEnemyUnits().Count == 0)
             Debug.Log("승리!");
-        else if (UnitManager.Instance.GetAllUnits().Count == 0)
+        else if (UnitManager.Instance.GetPlayerUnits().Count == 0)
             Debug.Log("패배!");
     }
 

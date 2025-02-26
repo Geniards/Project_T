@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,7 +11,7 @@ public class Unit : MonoBehaviour
 
     // 유닛 행동 상태 정보
     public E_UnitState unitState;
-    private bool isSelected = false;
+    public bool isSelected = false;
 
     /// <summary>
     /// 유닛 초기화
@@ -23,6 +24,8 @@ public class Unit : MonoBehaviour
         // UnitDatabase에서 unitId를 기반으로 데이터를 가져옴
         unitData = UnitDatabase.Instance.GetUnitDataById(spawnData.unitTypeId);
         unitData.unitTeam = (E_UnitTeam)spawnData.unitTeam;
+
+        // animation - mov01
 
         if (unitData == null)
         {
@@ -54,6 +57,8 @@ public class Unit : MonoBehaviour
         currentTile.ClearHighlight();
         GridManager.Instance.ClearWalkableTiles();
         //GridManager.Instance.ClearAttackableTiles();
+
+        //animation - mov01
     }
 
     /// <summary>
@@ -96,11 +101,30 @@ public class Unit : MonoBehaviour
     {
         foreach (Tile tile in path)
         {
-            transform.position = tile.transform.position;
-            yield return new WaitForSeconds(0.2f);
+            //animation - move01
+
+            // 타일 이동(한칸씩 이동)
+            //transform.position = tile.transform.position;
+            //yield return new WaitForSeconds(0.2f);
+
+            // 타일 이동(부드럽게 이동)
+            Vector3 startPos = transform.position;
+            Vector3 endPos = tile.transform.position;
+            float elapsedTime = 0f;
+            float moveDuration = 0.3f; // 이동 속도 조절
+
+            while (elapsedTime < moveDuration)
+            {
+                transform.position = Vector3.Lerp(startPos, endPos, (elapsedTime / moveDuration));
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+
+            transform.position = endPos;
         }
 
         currentTile.isOccupied = false;
+        unitState = E_UnitState.Move;
         SetCurrentTile(path[path.Count - 1]);
         currentTile.isOccupied = true;
         GridManager.Instance.FindAttackableTiles(this);
@@ -141,7 +165,8 @@ public class Unit : MonoBehaviour
         Unit target = FindAttackableUnit();
         if (target)
         {
-            GridManager.Instance.ShowHiggLight();
+            Debug.Log("제자리에서 공격합니다~~~");
+            GridManager.Instance.ShowHighLight();
             yield return new WaitForSeconds(0.5f);
             Attack(target);
             TurnManager.Instance.OnUnitTurnCompleted();
@@ -163,8 +188,8 @@ public class Unit : MonoBehaviour
             target = FindAttackableUnit();
             if (target)
             {
-                Debug.Log("공격합니다~~~");
-                GridManager.Instance.ShowHiggLight();
+                Debug.Log("이동 후 공격합니다~~~");
+                GridManager.Instance.ShowHighLight();
                 yield return new WaitForSeconds(0.5f);
                 Attack(target);
             }
@@ -176,7 +201,6 @@ public class Unit : MonoBehaviour
         yield return new WaitForSeconds(0.3f);
         GridManager.Instance.ClearAttackableTiles();
         TurnManager.Instance.OnUnitTurnCompleted();
-        yield return new WaitForSeconds(0.3f);
     }
 
     /// <summary>
@@ -211,6 +235,8 @@ public class Unit : MonoBehaviour
 #endif
         if (unitState == E_UnitState.Complete) return;
 
+        // aniamation - attak
+
         // 데미지 계산 및 공격 실행
         target.TakeDamage(unitData.attackPower);
         unitState = E_UnitState.Complete;
@@ -223,6 +249,8 @@ public class Unit : MonoBehaviour
     /// <param name="damage"></param>
     public void TakeDamage(int damage)
     {
+        //animation - spc01 
+
         unitData.hP -= damage;
 #if UNITY_EDITOR
         Debug.Log($"{unitData.unitId}가 {damage}의 피해를 입음! 남은 체력: {unitData.hP}");
