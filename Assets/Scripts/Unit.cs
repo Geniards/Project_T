@@ -34,16 +34,32 @@ public class Unit : MonoBehaviour
 
         // UnitDatabase에서 unitId를 기반으로 데이터를 가져옴
         UnitData unitDatas = UnitDatabase.Instance.GetUnitDataById(spawnData.unitTypeId);
-        DataToValue(ref unitDatas);
-
-        unitData.unitTeam = (E_UnitTeam)spawnData.unitTeam;
-
-        unitAnimator.SetOverrideAnimations(animData);
 
         if (unitData == null)
         {
             Debug.LogError($"UnitData를 찾을 수 없습니다! unitTypeId: {spawnData.unitTypeId}");
         }
+
+        // 새로운 인스턴스 생성 후 값 복사 (깊은 복사)
+        unitData = new UnitData
+        {
+            unitId = unitDatas.unitId,
+            unitName = unitDatas.unitName,
+            unitType = unitDatas.unitType,
+            unitTeam = (E_UnitTeam)spawnData.unitTeam,
+            hP = unitDatas.hP,
+            maxHP = unitDatas.maxHP,
+            mana = unitDatas.mana,
+            maxMana = unitDatas.maxMana,
+            exp = unitDatas.exp,
+            maxExp = unitDatas.maxExp,
+            level = unitDatas.level,
+            attackPower = unitDatas.attackPower,
+            attackRange = unitDatas.attackRange,
+            moveRange = unitDatas.moveRange
+        };
+
+        unitAnimator.SetOverrideAnimations(animData);
     }
 
     /// <summary>
@@ -116,8 +132,6 @@ public class Unit : MonoBehaviour
     {
         foreach (Tile tile in path)
         {
-            //animation - move01
-
             // 타일 이동(한칸씩 이동)
             //transform.position = tile.transform.position;
             //yield return new WaitForSeconds(0.2f);
@@ -144,7 +158,7 @@ public class Unit : MonoBehaviour
             currentTile.isOccupied = false;
 
             // 한 칸 이동 후 멈춤 효과
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.2f);
         }
 
         // 이동 완료 후 상태 변경
@@ -158,7 +172,7 @@ public class Unit : MonoBehaviour
         CheckIdleState();
 
         // 이동완료 후 공격범위에 유닛이 있는지 탐색
-        GridManager.Instance.FindAttackableTiles(this);
+        //GridManager.Instance.FindAttackableTiles(this);
         Deselect();
     }
 
@@ -213,9 +227,9 @@ public class Unit : MonoBehaviour
         if (targetTile)
         {
             yield return MoveToAI(targetTile);
-            yield return new WaitForSeconds(0.5f);
 
             // 5. 이동 후 다시 공격 가능 여부 확인
+            GridManager.Instance.FindAttackableTiles(this);
             target = FindAttackableUnit();
             if (target)
             {
@@ -318,24 +332,5 @@ public class Unit : MonoBehaviour
     {
         bool isDamaged = unitData.hP <= (unitData.maxHP * 0.3f); // 체력이 30% 이하이면 부상 상태
         unitAnimator.PlayIdleAnimation();
-    }
-
-    private void DataToValue(ref UnitData data)
-    {
-        unitData.unitId = data.unitId;
-        unitData.unitName = data.unitName;
-        unitData.unitType = data.unitType;
-        unitData.unitTeam = data.unitTeam;
-        unitData.hP = data.hP;
-        unitData.maxHP = data.maxHP;
-        unitData.mana = data.mana;
-        unitData.maxMana = data.maxMana;
-        unitData.exp = data.exp;
-        unitData.maxExp = data.maxExp;
-
-        unitData.level = data.level;
-        unitData.attackPower = data.attackPower;
-        unitData.attackRange = data.attackRange;
-        unitData.moveRange = data.moveRange;
     }
 }

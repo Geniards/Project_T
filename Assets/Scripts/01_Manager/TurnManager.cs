@@ -31,11 +31,6 @@ public class TurnManager : MonoBehaviour
         {
             CheckPlayerTurnEnd();
         }
-
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            GridManager.Instance.ShowHighLight();
-        }
     }
 
     /// <summary>

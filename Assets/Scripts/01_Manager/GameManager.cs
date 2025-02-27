@@ -57,9 +57,15 @@ public class GameManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.F))
         {
-            selectedUnit.unitState = E_UnitState.Complete;
             Debug.Log($"{selectedUnit.unitData.unitName}아군 턴 완료");
+            selectedUnit.unitState = E_UnitState.Complete;
             selectedUnit = null;
+        }
+
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            GridManager.Instance.FindAttackableTiles(selectedUnit);
+            GridManager.Instance.ShowHighLight();
         }
     }
 
