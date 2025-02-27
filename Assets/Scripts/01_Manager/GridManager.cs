@@ -106,11 +106,12 @@ public class GridManager : MonoBehaviour
         // 이전 하이라이트 제거 (단, 선택된 유닛 타일은 유지)
         if (prevHighlightedTile && prevHighlightedTile != GameManager.Instance.GetSelectedUnitTile())
         {
-            // 이동 가능한 타일은 이동 가능 하이라이트 사용
-            if (!IsWalkableTile(prevHighlightedTile))
+            if (!IsWalkableTile(prevHighlightedTile) && !attackableTiles.Contains(prevHighlightedTile))
                 prevHighlightedTile.ClearHighlight();
-            else 
-                prevHighlightedTile.HighlightTile(new Color(0f, 0f, 1f, 0.3f));
+            else if (IsWalkableTile(prevHighlightedTile))
+                prevHighlightedTile.HighlightTile(new Color(0f, 0f, 1f, 0.3f)); // 이동 가능 타일
+            else if (attackableTiles.Contains(prevHighlightedTile))
+                prevHighlightedTile.HighlightTile(new Color(1f, 0f, 0f, 0.3f)); // 공격 가능 타일
         }
 
         if (hoveredTile)
