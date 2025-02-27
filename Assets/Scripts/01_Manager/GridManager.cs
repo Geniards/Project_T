@@ -100,7 +100,7 @@ public class GridManager : MonoBehaviour
         Vector2Int gridPos = new Vector2Int(Mathf.RoundToInt(worldPos.x), Mathf.RoundToInt(worldPos.y));
         Tile hoveredTile = GetTile(gridPos);
 #if UNITY_EDITOR
-        Debug.Log($"마우스 위치 [{gridPos}]");
+        //Debug.Log($"마우스 위치 [{gridPos}]");
 #endif
 
         // 이전 하이라이트 제거 (단, 선택된 유닛 타일은 유지)

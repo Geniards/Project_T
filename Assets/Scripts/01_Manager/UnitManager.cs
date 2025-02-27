@@ -6,6 +6,9 @@ public class UnitManager : MonoBehaviour
 {
     public static UnitManager Instance { get; private set; }
 
+    [Header("애니메이션 데이터베이스")]
+    public UnitAnimationDatabase animationDatabase;
+
     // unitId를 가진 유닛이 여러 개 존재할 수 있기 때문에 같은 ID로 List로 묶어둔다.
     private Dictionary<int, List<Unit>> unitDictionary = new Dictionary<int, List<Unit>>();
 
@@ -62,7 +65,7 @@ public class UnitManager : MonoBehaviour
         // 오브젝트 풀에서 유닛 가져오기
         Unit unit = GameManager.Instance.GetUnit();
         Debug.Log($"Spawndata는 무엇일까여? {spawnData}");
-        unit.Initialize(spawnData);
+        unit.Initialize(spawnData, animationDatabase.GetAnimationData(spawnData.unitTypeId));
         unit.transform.position = tile.transform.position;
 
         // 현재 타일에 유닛 등록

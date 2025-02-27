@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Unit : MonoBehaviour
@@ -13,19 +14,31 @@ public class Unit : MonoBehaviour
     public E_UnitState unitState;
     public bool isSelected = false;
 
+    // 애니메이션 컨트롤러
+    private UnitAnimator unitAnimator;
+
+    private void Awake()
+    {
+        // 애니메이션 관리 클래스 가져오기
+        unitAnimator = GetComponent<UnitAnimator>();
+    }
+
+
     /// <summary>
     /// 유닛 초기화
     /// </summary>
     /// <param name="spawnData">유닛 초기화 정보</param>
-    public void Initialize(UnitSpawnData spawnData)
+    public void Initialize(UnitSpawnData spawnData, UnitAnimationData animData)
     {
         unitState = E_UnitState.Idle;
 
         // UnitDatabase에서 unitId를 기반으로 데이터를 가져옴
-        unitData = UnitDatabase.Instance.GetUnitDataById(spawnData.unitTypeId);
+        UnitData unitDatas = UnitDatabase.Instance.GetUnitDataById(spawnData.unitTypeId);
+        DataToValue(ref unitDatas);
+
         unitData.unitTeam = (E_UnitTeam)spawnData.unitTeam;
 
-        // animation - mov01
+        unitAnimator.SetOverrideAnimations(animData);
 
         if (unitData == null)
         {
@@ -43,6 +56,8 @@ public class Unit : MonoBehaviour
 
         isSelected = true;
         currentTile.HighlightTile(new Color(1f, 1f, 0f, 0.3f)); // 노란색 하이라이트
+
+        // 이동 범위 탐색
         GridManager.Instance.FindWalkableTiles(this);
     }
 
@@ -107,6 +122,10 @@ public class Unit : MonoBehaviour
             //transform.position = tile.transform.position;
             //yield return new WaitForSeconds(0.2f);
 
+            // 이동 방향 계산
+            Vector2Int direction = tile.vec2IntPos - currentTile.vec2IntPos;
+            unitAnimator.PlayMoveAnimation(direction); // 방향에 맞는 이동 애니메이션 실행
+
             // 타일 이동(부드럽게 이동)
             Vector3 startPos = transform.position;
             Vector3 endPos = tile.transform.position;
@@ -121,12 +140,24 @@ public class Unit : MonoBehaviour
             }
 
             transform.position = endPos;
+            currentTile = tile;
+            currentTile.isOccupied = false;
+
+            // 한 칸 이동 후 멈춤 효과
+            yield return new WaitForSeconds(0.1f);
         }
 
-        currentTile.isOccupied = false;
+        // 이동 완료 후 상태 변경
         unitState = E_UnitState.Move;
+
+        // 이동 완료 후 타일 정보 업데이트
+        currentTile.isOccupied = false;
         SetCurrentTile(path[path.Count - 1]);
         currentTile.isOccupied = true;
+
+        CheckIdleState();
+
+        // 이동완료 후 공격범위에 유닛이 있는지 탐색
         GridManager.Instance.FindAttackableTiles(this);
         Deselect();
     }
@@ -168,7 +199,7 @@ public class Unit : MonoBehaviour
             Debug.Log("제자리에서 공격합니다~~~");
             GridManager.Instance.ShowHighLight();
             yield return new WaitForSeconds(0.5f);
-            Attack(target);
+            StartCoroutine(Attack(target));
             TurnManager.Instance.OnUnitTurnCompleted();
             yield break;
         }
@@ -191,7 +222,7 @@ public class Unit : MonoBehaviour
                 Debug.Log("이동 후 공격합니다~~~");
                 GridManager.Instance.ShowHighLight();
                 yield return new WaitForSeconds(0.5f);
-                Attack(target);
+                StartCoroutine(Attack(target));
             }
         }
 
@@ -227,19 +258,24 @@ public class Unit : MonoBehaviour
     /// 유닛 공격
     /// </summary>
     /// <param name="target"></param>
-    public void Attack(Unit target)
+    public IEnumerator Attack(Unit target)
     {
-        if (!target) return;
+        if (!target) yield break;
 #if UNITY_EDITOR
         Debug.Log($"{unitData.unitId}가 {target.unitData.unitId}를 공격!");
 #endif
-        if (unitState == E_UnitState.Complete) return;
+        if (unitState == E_UnitState.Complete) yield break;
 
-        // aniamation - attak
+        // 공격애니메이션 실행
+        Vector2Int direction = target.currentTile.vec2IntPos - currentTile.vec2IntPos;
+        unitAnimator.PlayAttackAnimation(direction);
 
         // 데미지 계산 및 공격 실행
-        target.TakeDamage(unitData.attackPower);
+        StartCoroutine( target.TakeDamage(unitData.attackPower));
         unitState = E_UnitState.Complete;
+        yield return new WaitForSeconds(0.3f);
+        unitAnimator.PlayIdleAnimation();
+        GridManager.Instance.ClearAttackableTiles();
         Deselect();
     }
 
@@ -247,18 +283,20 @@ public class Unit : MonoBehaviour
     /// 데미지 입었을때
     /// </summary>
     /// <param name="damage"></param>
-    public void TakeDamage(int damage)
+    public IEnumerator TakeDamage(int damage)
     {
-        //animation - spc01 
-
+        // 피격 애니메이션 실행
+        unitAnimator.PlayHitAnimation();
         unitData.hP -= damage;
 #if UNITY_EDITOR
         Debug.Log($"{unitData.unitId}가 {damage}의 피해를 입음! 남은 체력: {unitData.hP}");
 #endif
+        yield return new WaitForSeconds(0.5f);
         if (unitData.hP <= 0)
         {
             Die();
         }
+        CheckIdleState();
     }
 
     /// <summary>
@@ -266,8 +304,38 @@ public class Unit : MonoBehaviour
     /// </summary>
     private void Die()
     {
+        // 사망 애니메이션 실행
+        unitAnimator.PlayDeathAnimation();
         Debug.Log($"{unitData.unitId} 사망!");
         currentTile.isOccupied = false;
         UnitManager.Instance.RemoveUnit(this);
+    }
+
+    /// <summary>
+    /// 현재 체력에 따라 적절한 Idle 상태 적용
+    /// </summary>
+    private void CheckIdleState()
+    {
+        bool isDamaged = unitData.hP <= (unitData.maxHP * 0.3f); // 체력이 30% 이하이면 부상 상태
+        unitAnimator.PlayIdleAnimation();
+    }
+
+    private void DataToValue(ref UnitData data)
+    {
+        unitData.unitId = data.unitId;
+        unitData.unitName = data.unitName;
+        unitData.unitType = data.unitType;
+        unitData.unitTeam = data.unitTeam;
+        unitData.hP = data.hP;
+        unitData.maxHP = data.maxHP;
+        unitData.mana = data.mana;
+        unitData.maxMana = data.maxMana;
+        unitData.exp = data.exp;
+        unitData.maxExp = data.maxExp;
+
+        unitData.level = data.level;
+        unitData.attackPower = data.attackPower;
+        unitData.attackRange = data.attackRange;
+        unitData.moveRange = data.moveRange;
     }
 }

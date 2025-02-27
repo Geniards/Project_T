@@ -32,15 +32,6 @@ public class TurnManager : MonoBehaviour
             CheckPlayerTurnEnd();
         }
 
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            foreach (Unit unit in playerUnits)
-            {
-                unit.unitState = E_UnitState.Complete;
-                Debug.Log("아군 턴 완료");
-            }
-        }
-
         if (Input.GetKeyDown(KeyCode.A))
         {
             GridManager.Instance.ShowHighLight();

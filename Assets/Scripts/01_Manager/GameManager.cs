@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -52,6 +53,13 @@ public class GameManager : MonoBehaviour
         {
             isAutoBattle = !isAutoBattle;
             Debug.Log($"자동 전투 모드: {(isAutoBattle ? "ON" : "OFF")}");
+        }
+
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            selectedUnit.unitState = E_UnitState.Complete;
+            Debug.Log($"{selectedUnit.unitData.unitName}아군 턴 완료");
+            selectedUnit = null;
         }
     }
 
@@ -142,37 +150,37 @@ public class GameManager : MonoBehaviour
                 return;
             }
 
-            // 선택된 유닛 재선택시 해제
+            // 제자리 이동
             if (selectedUnit && clickedTile == selectedUnitTile)
             {
                 selectedUnit.Deselect();
-                GridManager.Instance.ClearWalkableTiles();
                 GridManager.Instance.FindAttackableTiles(selectedUnit);
-                if (selectedUnit.FindAttackableUnit())
-                {
-                    GridManager.Instance.ShowHighLight();
-                }
-                else
-                {
-                    selectedUnit = null;
-                    Debug.Log("공격 가능한 유닛이 없음 - 대기 상태 유지");
-                }
+                selectedUnit.unitState = E_UnitState.Move;
+
+
+                // 공격범위를 찾기만하고 다음에 버튼의 UI를 눌러서 진행 할수 있도록 한다.
+                // 이때 제자리 이동 후 공격을 안하고 턴을 종료할시 
+                // selectedUnit = null; 선택된 유닛을 제거해야한다.
                 return;
             }
+            // 이동 가능한 타일인 경우 이동
             else if (selectedUnit && GridManager.Instance.IsWalkableTile(clickedTile))
             {
                 selectedUnit.MoveTo(clickedTile);
 
                 return;
             }
+            // 이동 불가능한 타일인 경우 이동 불가 재탐색
+            else if (selectedUnit && clickedTile != selectedUnitTile && selectedUnit.unitState != E_UnitState.Move)
+            {
+                selectedUnit.Deselect();
+                selectedUnit = null;
+            }
 
             // 선택된 유닛이 적을 공격 가능한 경우
             if (selectedUnit && clickedUnit && selectedUnit.unitData.unitTeam != clickedUnit.unitData.unitTeam)
             {
-                selectedUnit.Attack(clickedUnit);
-                GridManager.Instance.ClearAttackableTiles();
-                selectedUnit = null;
-                return;
+                StartCoroutine(selectedUnit.Attack(clickedUnit));
             }
 
             // 선택된 유닛이 없는 경우(유닛 선택 부분)
