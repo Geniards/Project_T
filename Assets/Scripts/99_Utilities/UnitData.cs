@@ -8,7 +8,9 @@ using UnityEngine;
 public class UnitData
 {
     public int unitId;
+    public string unitName;
     public E_UnitTeam unitTeam;
+    public int unitTeamNum;
     public int hP;
     public int maxHP;
     public int mana;
@@ -28,5 +30,10 @@ public class UnitData
     public void IntToUnitType()
     {
         unitType = (E_UnitType)unitTypeNum;
+    }
+
+    public void IntToUnitTeam()
+    {
+        unitTeam = (E_UnitTeam)unitTeamNum;
     }
 }

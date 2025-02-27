@@ -5,6 +5,7 @@ public enum E_UnitState
 {
    None,
    Idle,
+   Select,
    Move,
    Attack,
    Hitted,
