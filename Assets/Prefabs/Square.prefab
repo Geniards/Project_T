@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4113754996296786013}
   - component: {fileID: 8393063015633229975}
-  - component: {fileID: 7866293622235134258}
+  - component: {fileID: 8552502830509375016}
   m_Layer: 0
   m_Name: Square
   m_TagString: Untagged
@@ -85,7 +85,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &7866293622235134258
+--- !u!114 &8552502830509375016
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -101,4 +101,4 @@ MonoBehaviour:
   isWalkable: 1
   isOccupied: 0
   tileType: 0
-  defaultColor: {r: 1, g: 1, b: 1, a: 0.5}
+  defaultColor: {r: 1, g: 1, b: 1, a: 0}

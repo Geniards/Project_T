@@ -171,8 +171,10 @@ public class Unit : MonoBehaviour
 
         CheckIdleState();
 
-        // 이동완료 후 공격범위에 유닛이 있는지 탐색
-        //GridManager.Instance.FindAttackableTiles(this);
+        // 이동완료 후 메뉴 UI 갱신
+        if(unitData.unitTeam == E_UnitTeam.Ally)
+            UIManager.Instance.ShowActionMenu(this);
+
         Deselect();
     }
 
@@ -302,6 +304,7 @@ public class Unit : MonoBehaviour
         // 피격 애니메이션 실행
         unitAnimator.PlayHitAnimation();
         unitData.hP -= damage;
+        UIManager.Instance.CheckHp(this);
 #if UNITY_EDITOR
         Debug.Log($"{unitData.unitId}가 {damage}의 피해를 입음! 남은 체력: {unitData.hP}");
 #endif
