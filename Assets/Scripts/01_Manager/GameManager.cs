@@ -173,7 +173,6 @@ public class GameManager : MonoBehaviour
             else if (selectedUnit && GridManager.Instance.IsWalkableTile(clickedTile))
             {
                 selectedUnit.MoveTo(clickedTile);
-
                 return;
             }
             // 이동 불가능한 타일인 경우 이동 불가 재탐색

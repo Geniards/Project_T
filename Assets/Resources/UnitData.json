@@ -10,7 +10,7 @@
       "level": 5,
       "exp": 0,
       "maxExp": 500,
-      "attackPower": 4,
+      "attackPower": 40,
       "unitTypeNum": 1,
       "attackRange": 5,
       "moveRange": 3

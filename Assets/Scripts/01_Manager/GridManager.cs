@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GridManager : MonoBehaviour
 {
@@ -20,6 +21,8 @@ public class GridManager : MonoBehaviour
 
     // 공격가능한 타일리스트
     public List<Tile> attackableTiles = new List<Tile>();
+
+    public Image background;
 
     private void Awake()
     {
@@ -39,13 +42,19 @@ public class GridManager : MonoBehaviour
     public void LoadGrid(StageData stageData)
     {
         ResetGrid();
+        Debug.Log(Resources.Load<Sprite>(stageData.imagePath));
+        // 이미지 로드
+        background.sprite = Resources.Load<Sprite>(stageData.imagePath);
+        background.transform.position = new Vector3(stageData.width / 2, stageData.height / 2, 0);
+        background.transform.localScale = new Vector3(0.15f, 0.15f, 0);
+
         // 그리드 생성
         GenerateGridFromTileMap(stageData);
     }
 
     private void GenerateGridFromTileMap(StageData stageData)
     {
-        for(int y = 0; y < stageData.height; y++)
+        for (int y = 0; y < stageData.height; y++)
         {
             for (int x = 0; x < stageData.width; x++) 
             {
@@ -61,7 +70,7 @@ public class GridManager : MonoBehaviour
                     tile.SetTileProperties(tileInfo.walkable, Enum.Parse<E_TileType>(tileInfo.type));
 
                     if (!tile.isWalkable)
-                        tile.defaultColor = new Color(0, 0, 01f);
+                        tile.defaultColor = new Color(0, 0, 1f);
 
                     tileDictionary[position] = tile;
                 }
@@ -120,6 +129,7 @@ public class GridManager : MonoBehaviour
             if (hoveredTile != GameManager.Instance.GetSelectedUnitTile())
             {
                 hoveredTile.HighlightTile(new Color(1f, 1f, 1f, 0.1f)); // 연한 흰색 하이라이트
+                UIManager.Instance.UnitStatusUI(UnitManager.Instance.GetUnitAtPosition(hoveredTile.vec2IntPos));
             }
             prevHighlightedTile = hoveredTile;
         }

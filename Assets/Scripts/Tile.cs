@@ -14,7 +14,7 @@ public class Tile : MonoBehaviour
 
     // 타일 하이라이트
     private SpriteRenderer spriteRenderer;
-    public Color defaultColor = new Color(1, 1, 1, 0.5f); // 투명색
+    public Color defaultColor = new Color(1, 1, 1, 0f); // 투명색
     private Color currentColor;
 
 
