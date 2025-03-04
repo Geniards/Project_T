@@ -216,6 +216,11 @@ public class GameManager : MonoBehaviour
         return selectedUnitTile;
     }
 
+    public Unit GetSelectedUnit()
+    {
+        return selectedUnit;
+    }
+
     private void ResultGame()
     {
         if (UnitManager.Instance.GetEnemyUnits().Count == 0)

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEngine.UI.CanvasScaler;
 
 public class Unit : MonoBehaviour
 {
@@ -170,7 +171,6 @@ public class Unit : MonoBehaviour
         currentTile.isOccupied = true;
 
         CheckIdleState();
-
         // 이동완료 후 메뉴 UI 갱신
         if(unitData.unitTeam == E_UnitTeam.Ally)
             UIManager.Instance.ShowActionMenu(this);
@@ -292,6 +292,10 @@ public class Unit : MonoBehaviour
         yield return new WaitForSeconds(0.3f);
         unitAnimator.PlayIdleAnimation();
         GridManager.Instance.ClearAttackableTiles();
+
+        // UI 선택창 다시 On
+        if (unitData.unitTeam == E_UnitTeam.Ally)
+            UIManager.Instance.ShowActionMenu(this);
         Deselect();
     }
 

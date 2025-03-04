@@ -11,10 +11,10 @@ public class UnitData
     public string unitName;
     public E_UnitTeam unitTeam;
     public int unitTeamNum;
-    public int hP;
-    public int maxHP;
-    public int mana;
-    public int maxMana;
+    public float hP;
+    public float maxHP;
+    public float mana;
+    public float maxMana;
     public int level;
     public float exp;
     public float maxExp;
