@@ -1218,6 +1218,7 @@ MonoBehaviour:
   hpSlider: {fileID: 1551953058}
   manaSlider: {fileID: 933876721}
   expSlider: {fileID: 1615547885}
+  canvasGroup: {fileID: 907846335}
 --- !u!1 &885225602
 GameObject:
   m_ObjectHideFlags: 0
@@ -1329,8 +1330,9 @@ GameObject:
   - component: {fileID: 907846332}
   - component: {fileID: 907846331}
   - component: {fileID: 907846334}
+  - component: {fileID: 907846335}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: MenuCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1431,6 +1433,18 @@ SortingGroup:
   m_SortingLayerID: 310594969
   m_SortingLayer: 4
   m_SortingOrder: 1
+--- !u!225 &907846335
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 907846329}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &933876719
 GameObject:
   m_ObjectHideFlags: 0

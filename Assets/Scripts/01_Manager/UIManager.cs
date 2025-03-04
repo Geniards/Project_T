@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -29,14 +30,14 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] private CanvasGroup canvasGroup;
 
-    private Unit selectedUnit;
     // 마지막으로 상태 UI를 표시한 유닛
     private Unit lastHoveredUnit;
 
     // 메뉴창이 열려 있는지 확인하는 변수
     private bool isActionMenuVisible = false;
+    public Unit selectedUnit { get; set; }
     // 공격 취소 가능상태
-    private bool isAttackMode = false;
+    public bool isAttackMode { get; set; }
 
 
     private void Awake()
@@ -104,13 +105,15 @@ public class UIManager : MonoBehaviour
         if (selectedUnit == null) return;
 
         // 1. 메뉴 숨김
-        HideActionMenu();
 
-        // 2. 공격 가능 범위 표시
-        GridManager.Instance.FindAttackableTiles(selectedUnit);
-        GridManager.Instance.ShowHighLight();
-
-        isAttackMode = true;
+        if (selectedUnit.unitState == E_UnitState.Move)
+        {
+            HideActionMenu();
+            // 2. 공격 가능 범위 표시
+            GridManager.Instance.FindAttackableTiles(selectedUnit);
+            GridManager.Instance.ShowHighLight();
+            isAttackMode = true;
+        }
     }
 
     private void OnWaitButtonClick()
@@ -128,13 +131,18 @@ public class UIManager : MonoBehaviour
         HideActionMenu();
     }
 
-    /// <summary>
-    /// 메뉴창이 열려 있을 때 타일 클릭 방지
-    /// </summary>
-    /// <returns></returns>
-    public bool IsActionMenuVisible()
+    public void CancelAttackMode()
     {
-        return isActionMenuVisible;
+        if (!isAttackMode) return;
+
+        isAttackMode = false;
+        GridManager.Instance.ClearAttackableTiles();
+        ShowActionMenu(selectedUnit);
+    }
+
+    public bool IsAttackMode()
+    {
+        return isAttackMode;
     }
 
     /// <summary>

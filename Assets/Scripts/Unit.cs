@@ -11,6 +11,8 @@ public class Unit : MonoBehaviour
     public UnitData unitData; // 유닛 기본 정보
     public Tile currentTile; // 유닛이 현재 위치한 타일 위치
 
+    public Vector2Int previousPosition; // 이동 전 위치 저장
+
     // 유닛 행동 상태 정보
     public E_UnitState unitState;
     public bool isSelected = false;
@@ -99,6 +101,9 @@ public class Unit : MonoBehaviour
     /// <param name="targetTile"></param>
     public void MoveTo(Tile targetTile)
     {
+        // 현재 위치를 이동 전 위치로 저장
+        previousPosition = currentTile.vec2IntPos;
+
         Tile moveTile = GridManager.Instance.FindNearestReachableTile(this, targetTile);
         List<Tile> path = GridManager.Instance.FindPathAStar(currentTile, moveTile);
 
@@ -339,5 +344,29 @@ public class Unit : MonoBehaviour
     {
         bool isDamaged = unitData.hP <= (unitData.maxHP * 0.3f); // 체력이 30% 이하이면 부상 상태
         unitAnimator.PlayIdleAnimation();
+    }
+
+    /// <summary>
+    /// Undo행동
+    /// </summary>
+    public void UndoMove()
+    {
+        if (unitState != E_UnitState.Move) return; // 이동한 상태가 아닐 경우 실행 X
+
+        Tile previousTile = GridManager.Instance.GetTile(previousPosition);
+        if (previousTile == null) return;
+
+        // 현재 타일 비우기
+        currentTile.isOccupied = false;
+
+        // 이전 타일로 복귀
+        SetCurrentTile(previousTile);
+        transform.position = previousTile.transform.position;
+
+        // 상태를 Idle로 되돌려서 다시 행동 가능하게 설정
+        unitState = E_UnitState.Idle;
+
+        // UI 업데이트
+        UIManager.Instance.HideActionMenu();
     }
 }

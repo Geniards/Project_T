@@ -10,6 +10,7 @@ public class InputManager : MonoBehaviour
     private PlayerInput playerInput;    // PlayerInput 사용
     private InputAction selectAction;   // 선택 액션
     private InputAction moveAction;     // 마우스 이동 액션
+    private InputAction rightClickAction; // Undo 액션
 
     private void Awake()
     {
@@ -20,10 +21,12 @@ public class InputManager : MonoBehaviour
 
             playerInput = GetComponent<PlayerInput>();      // PlayerInput 컴포넌트 가져오기
             selectAction = playerInput.actions["Select"];   // Select 액션 가져오기
-            moveAction = playerInput.actions["Move"];       //Move 액션 가져오기
+            moveAction = playerInput.actions["Move"];       // Move 액션 가져오기
+            rightClickAction = playerInput.actions["RightClick"]; // "RightClick" 액션 가져오기
 
             selectAction.performed += OnSelectPerformed;    // 액션 수행시 호출할 함수 등록
             moveAction.performed += OnMouseMove;
+            rightClickAction.performed += HandleRightClick;
         }
         else
         {
@@ -52,5 +55,17 @@ public class InputManager : MonoBehaviour
         Vector2 worldPos = Camera.main.ScreenToWorldPoint(screenPos);
 
         GridManager.Instance.HandleMouseOver(worldPos);
+    }
+
+    private void HandleRightClick(InputAction.CallbackContext context)
+    {
+        if (UIManager.Instance.IsAttackMode())
+        {
+            UIManager.Instance.CancelAttackMode();
+        }
+        else
+        {
+            GameManager.Instance.UndoMove();
+        }
     }
 }

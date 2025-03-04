@@ -161,8 +161,10 @@ public class GameManager : MonoBehaviour
             {
                 selectedUnit.Deselect();
                 GridManager.Instance.FindAttackableTiles(selectedUnit);
+                GridManager.Instance.ShowHighLight();
                 selectedUnit.unitState = E_UnitState.Move;
-
+                UIManager.Instance.isAttackMode = true;
+                UIManager.Instance.selectedUnit = selectedUnit;
 
                 // 공격범위를 찾기만하고 다음에 버튼의 UI를 눌러서 진행 할수 있도록 한다.
                 // 이때 제자리 이동 후 공격을 안하고 턴을 종료할시 
@@ -201,11 +203,24 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 특정 타일이 선택된 유닛이 점유하고 있는지 확인
+    /// 선택된 유닛의 이동 되돌리기
     /// </summary>
-    public bool IsTileOccupiedBySelectedUnit(Tile tile)
+    public void UndoMove()
     {
-        return selectedUnitTile == tile;
+        if (!selectedUnit || selectedUnit.unitState != E_UnitState.Move)
+        {
+            Debug.Log("이전 위치로 되돌릴 유닛이 없습니다.");
+            return;
+        }
+
+        selectedUnit.UndoMove();
+        selectedUnitTile = selectedUnit.currentTile;
+
+        // 공격 모드 해제
+        UIManager.Instance.isAttackMode = false;
+        GridManager.Instance.ClearAttackableTiles();
+
+        selectedUnit.Select();
     }
 
     /// <summary>
