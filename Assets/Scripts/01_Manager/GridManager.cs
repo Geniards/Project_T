@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class GridManager : MonoBehaviour
@@ -47,6 +48,14 @@ public class GridManager : MonoBehaviour
         background.sprite = Resources.Load<Sprite>(stageData.imagePath);
         background.transform.position = new Vector3(stageData.width / 2, stageData.height / 2, 0);
         background.transform.localScale = new Vector3(0.15f, 0.15f, 0);
+
+        // 맵 중앙 위치 계산
+        Vector3 mapCenter = new Vector3(stageData.width / 2f, stageData.height / 2f, Camera.main.transform.position.z);
+        Camera.main.transform.position = new Vector3(mapCenter.x, mapCenter.y, mapCenter.z);
+
+        // 마우스 커서를 맵 중앙으로 이동 (스크린 좌표 변환 필요)
+        Vector2 screenCenter = Camera.main.WorldToScreenPoint(mapCenter);
+        Mouse.current.WarpCursorPosition(screenCenter);
 
         // 그리드 생성
         GenerateGridFromTileMap(stageData);

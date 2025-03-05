@@ -48,25 +48,25 @@ public class GameManager : MonoBehaviour
     {
         ResultGame();
 
-        // 자동 전투 토글
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            isAutoBattle = !isAutoBattle;
-            Debug.Log($"자동 전투 모드: {(isAutoBattle ? "ON" : "OFF")}");
-        }
+        //// 자동 전투 토글
+        //if (Input.GetKeyDown(KeyCode.T))
+        //{
+        //    isAutoBattle = !isAutoBattle;
+        //    Debug.Log($"자동 전투 모드: {(isAutoBattle ? "ON" : "OFF")}");
+        //}
 
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            Debug.Log($"{selectedUnit.unitData.unitName}아군 턴 완료");
-            selectedUnit.unitState = E_UnitState.Complete;
-            selectedUnit = null;
-        }
+        //if (Input.GetKeyDown(KeyCode.F))
+        //{
+        //    Debug.Log($"{selectedUnit.unitData.unitName}아군 턴 완료");
+        //    selectedUnit.unitState = E_UnitState.Complete;
+        //    selectedUnit = null;
+        //}
 
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            GridManager.Instance.FindAttackableTiles(selectedUnit);
-            GridManager.Instance.ShowHighLight();
-        }
+        //if (Input.GetKeyDown(KeyCode.A))
+        //{
+        //    GridManager.Instance.FindAttackableTiles(selectedUnit);
+        //    GridManager.Instance.ShowHighLight();
+        //}
     }
 
     /// <summary>

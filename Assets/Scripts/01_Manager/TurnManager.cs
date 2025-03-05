@@ -27,10 +27,10 @@ public class TurnManager : MonoBehaviour
 
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.S))
-        {
-            CheckPlayerTurnEnd();
-        }
+        //if(Input.GetKeyDown(KeyCode.S))
+        //{
+        //    CheckPlayerTurnEnd();
+        //}
     }
 
     /// <summary>
