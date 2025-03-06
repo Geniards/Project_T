@@ -23,7 +23,7 @@ public class GridManager : MonoBehaviour
     // 공격가능한 타일리스트
     public List<Tile> attackableTiles = new List<Tile>();
 
-    public Image background;
+    public SpriteRenderer background;
 
     private void Awake()
     {
@@ -43,11 +43,18 @@ public class GridManager : MonoBehaviour
     public void LoadGrid(StageData stageData)
     {
         ResetGrid();
+
+        SpriteRenderer bgRenderer = background.GetComponent<SpriteRenderer>();
+        if (!bgRenderer)
+        {
+            bgRenderer = background.gameObject.AddComponent<SpriteRenderer>();
+        }
+
         Debug.Log(Resources.Load<Sprite>(stageData.imagePath));
         // 이미지 로드
         background.sprite = Resources.Load<Sprite>(stageData.imagePath);
-        background.transform.position = new Vector3(stageData.width / 2, stageData.height / 2, 0);
-        background.transform.localScale = new Vector3(0.15f, 0.15f, 0);
+        background.transform.position = new Vector3(stageData.width / 2 - 0.5f, stageData.height / 2 - 0.5f, 1);
+        background.transform.localScale = new Vector3(1, 1, 1);
 
         // 맵 중앙 위치 계산
         Vector3 mapCenter = new Vector3(stageData.width / 2f, stageData.height / 2f, Camera.main.transform.position.z);
