@@ -1,0 +1,49 @@
+{
+  "units": [
+    {
+      "unitId": 1,
+      "unitName": "조조",
+      "hP": 200,
+      "maxHP": 200,
+      "mana": 50,
+      "maxMana": 50,
+      "level": 5,
+      "exp": 0,
+      "maxExp": 500,
+      "attackPower": 40,
+      "unitTypeNum": 1,
+      "attackRange": 5,
+      "moveRange": 3
+    },
+    {
+      "unitId": 2,
+      "unitName": "일반 병사",
+      "hP": 100,
+      "maxHP": 100,
+      "mana": 50,
+      "maxMana": 50,
+      "level": 2,
+      "exp": 100,
+      "maxExp": 500,
+      "attackPower": 10,
+      "unitTypeNum": 2,
+      "attackRange": 1,
+      "moveRange": 3
+    },
+    {
+      "unitId": 3,
+      "unitName": "궁수",
+      "hP": 80,
+      "maxHP": 80,
+      "mana": 50,
+      "maxMana": 50,
+      "level": 3,
+      "exp": 200,
+      "maxExp": 500,
+      "attackPower": 15,
+      "unitTypeNum": 3,
+      "attackRange": 2,
+      "moveRange": 2
+    }
+  ]
+}

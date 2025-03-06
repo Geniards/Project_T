@@ -1,0 +1,40 @@
+{
+  "stageId": 1,
+  "stageName": "영천 전투",
+  "width": 20,
+  "height": 20,
+  "tileLegendList": [
+    { "key": "G", "value": { "type": "Grass", "walkable": true } },
+    { "key": "R", "value": { "type": "Road", "walkable": true } },
+    { "key": "W", "value": { "type": "Water", "walkable": false } },
+    { "key": "M", "value": { "type": "Mountain", "walkable": false } }
+  ],
+  "tileMap": [
+    "GGGGGGRRRGGGGGGGGGGG",
+    "WGGGGGGRRRGGGGGGGGGG",
+    "WWGGGGGRRRRGGGGGGGGG",
+    "WWWGGGGGRRRGGGGGGGWW",
+    "WWWWGGGGRRRGGGGGGWWW",
+    "WWWWWGGRRRRGGGGGGWWW",
+    "WWWWWMMMMRRMMMMGGWWW",
+    "WWWWWMRRRRRRRRMGWWWW",
+    "WWWWWMRRRRRRRRMGWWWW",
+    "WWWWGMRRRRRRRRMGWWWW",
+    "WWWWRRRRRMMRRRMWWWWW",
+    "WWWRRRRRRRRRRRMWWWWW",
+    "WRRRRMRRRRRRRRMWWWWW",
+    "RRRRRMRRRRRRRRMGWWWW",
+    "RRRRRMMMMRRMMMMRGGWW",
+    "GGGGGRRRRRRRRRRRGGGW",
+    "GGGGGGRRRRRRRRRRGGGG",
+    "GGGGGGGRRRRRRRRRGGGG",
+    "GGGGGGGGRRRRRRRRGGGG",
+    "GGGGGGGGGRRRRRGGGGGG"
+  ],
+  "imagePath" :  "Stage/Stage01",
+  "units": [
+    { "unitTypeId": 1, "startX": 3, "startY": 3, "unitTeam": 1 },
+    { "unitTypeId": 2, "startX": 7, "startY": 8, "unitTeam": 2 },
+    { "unitTypeId": 2, "startX": 9, "startY": 10, "unitTeam": 2 }
+  ]
+}
