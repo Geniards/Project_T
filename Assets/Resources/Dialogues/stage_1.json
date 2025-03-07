@@ -1,0 +1,14 @@
+{
+  "dialogues": [
+    {
+      "name": "조조",
+      "portrait": "Jojo",
+      "text": "뭐라고 적어야할까?"
+    },
+    {
+      "name": "하후돈",
+      "portrait": "Hahudon",
+      "text": "그르게.. 머라고 적어야할까?"
+    }
+  ]
+}
