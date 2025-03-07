@@ -7,6 +7,8 @@ using static UnityEngine.UI.CanvasScaler;
 
 public class Unit : MonoBehaviour
 {
+    public event Action OnMoveComplete; // 이동 완료 이벤트
+
     // 유닛 기본 정보
     public UnitData unitData; // 유닛 기본 정보
     public Tile currentTile; // 유닛이 현재 위치한 타일 위치
@@ -177,8 +179,13 @@ public class Unit : MonoBehaviour
 
         CheckIdleState();
         // 이동완료 후 메뉴 UI 갱신
-        if(unitData.unitTeam == E_UnitTeam.Ally)
-            UIManager.Instance.ShowActionMenu(this);
+        if (unitData.unitTeam == E_UnitTeam.Ally)
+        {
+            UIManager.Instance.selectedUnit = this;
+            UIManager.Instance.ShowActionMenu();
+        }
+        // 이동 완료 후 이벤트 실행
+        OnMoveComplete?.Invoke();
 
         Deselect();
     }
@@ -300,7 +307,10 @@ public class Unit : MonoBehaviour
 
         // UI 선택창 다시 On
         if (unitData.unitTeam == E_UnitTeam.Ally)
-            UIManager.Instance.ShowActionMenu(this);
+        {
+            UIManager.Instance.selectedUnit = this;
+            UIManager.Instance.ShowActionMenu();
+        }
         Deselect();
     }
 

@@ -56,7 +56,14 @@ public class DialogueManager : MonoBehaviour
     public void StartDialogue()
     {
         if (dialogueQueue.Count > 0)
+        {
+            // 입력 및 UI 숨김
+            InputManager.Instance.EnableDialogueActive();
+            UIManager.Instance.HideActionMenu();
+            
+            // 다음 대화 시작
             ShowNextDialogue();
+        }
     }
 
     /// <summary>
@@ -68,6 +75,8 @@ public class DialogueManager : MonoBehaviour
         if (dialogueQueue.Count == 0)
         {
             dialogueUI.HideDialogueBox();
+            InputManager.Instance.DisableDialogueActive();
+            UIManager.Instance.ShowActionMenu();
             return;
         }
         // 다음 대사를 꺼냄

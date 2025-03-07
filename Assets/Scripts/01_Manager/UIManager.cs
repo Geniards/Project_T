@@ -10,12 +10,13 @@ public class UIManager : MonoBehaviour
     public static UIManager Instance { get; private set; }
 
     // 행동 선택 UI
-    public GameObject actionMenu;
-    public Button attackButton; // 공격 버튼
-    public Button waitButton;   // 대기 버튼
-    public Button cancelButton; // 취소 버튼
+    [Header("버튼 프리펩")]
+    [SerializeField] private GameObject actionMenu;
+    [SerializeField] private Button attackButton; // 공격 버튼
+    [SerializeField] private Button waitButton;   // 대기 버튼
+    [SerializeField] private Button cancelButton; // 취소 버튼
 
-    // UI 유닛 상태 프리팹
+    [Header("UI 텍스트")]
     [SerializeField] private GameObject unitStatusUI;
     [SerializeField] private TMP_Text hpTMP;
     [SerializeField] private TMP_Text manaTMP;
@@ -24,11 +25,15 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TMP_Text levelTMP;
     [SerializeField] private TMP_Text classTMP;
 
+    [Header("UI 슬라이더")]
     [SerializeField] private Slider hpSlider;
     [SerializeField] private Slider manaSlider;
     [SerializeField] private Slider expSlider;
 
     [SerializeField] private CanvasGroup canvasGroup;
+
+    [Header("UI 위치")]
+    [SerializeField] private Vector3 uiPos;
 
     // 마지막으로 상태 UI를 표시한 유닛
     private Unit lastHoveredUnit;
@@ -63,17 +68,18 @@ public class UIManager : MonoBehaviour
     /// 행동 선택 메뉴 표시
     /// </summary>
     /// <param name="unit"></param>
-    public void ShowActionMenu(Unit unit)
+    public void ShowActionMenu()
     {
-        selectedUnit = unit;
         actionMenu.SetActive(true);
         isActionMenuVisible = true;
 
         // 메뉴 활성화 시 UI 뒤쪽 터치 방지
         canvasGroup.blocksRaycasts = true;
         canvasGroup.interactable = true;
-
-        actionMenu.transform.position = unit.transform.position + new Vector3(1f, 0, -1f);
+        
+        uiPos = selectedUnit.transform.position + new Vector3(1f, 0, -1f);
+        actionMenu.transform.position = uiPos;
+    
         // 선택된 유닛을 마지막에 호버된 유닛으과 같다면 StatusUI를 false로
         if (lastHoveredUnit == selectedUnit)
         {
@@ -137,7 +143,7 @@ public class UIManager : MonoBehaviour
 
         isAttackMode = false;
         GridManager.Instance.ClearAttackableTiles();
-        ShowActionMenu(selectedUnit);
+        ShowActionMenu();
     }
 
     public bool IsAttackMode()
