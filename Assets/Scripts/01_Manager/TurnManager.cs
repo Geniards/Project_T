@@ -12,6 +12,7 @@ public class TurnManager : MonoBehaviour
     private Queue<Unit> enemyUnits = new Queue<Unit>();
 
     private bool isPlayerTurn = true;
+    private int turnCount = 1;
 
     private void Awake()
     {
@@ -38,15 +39,21 @@ public class TurnManager : MonoBehaviour
     /// </summary>
     public void StartTurn()
     {
+        StartCoroutine(StartTurnSequence());
+    }
+
+    private IEnumerator StartTurnSequence()
+    {
+        // 턴 UI 표시
+        yield return UIManager.Instance.ShowTurnUI(isPlayerTurn, turnCount);
+
         GridManager.Instance.ClearAttackableTiles();
         if (isPlayerTurn)
         {
-            Debug.Log("아군 턴 시작!");
             StartPlayerTurn();
         }
         else
         {
-            Debug.Log("적군 턴 시작!");
             StartCoroutine(EnemyTurnRoutine());
         }
     }
@@ -110,6 +117,14 @@ public class TurnManager : MonoBehaviour
     {
         // 턴 변경
         isPlayerTurn = !isPlayerTurn;
+        if (isPlayerTurn)
+        {
+            turnCount++;
+        }
+
+        // 승리/ 패배 체크
+        GameManager.Instance.CheckGameState();
+
         StartTurn();
     }
 
@@ -122,5 +137,10 @@ public class TurnManager : MonoBehaviour
         {
             EndTurn();
         }
+    }
+
+    public int GetTurnCount()
+    {
+        return turnCount;
     }
 }

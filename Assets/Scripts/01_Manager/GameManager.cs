@@ -1,13 +1,15 @@
-using UnityEditor;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
     [Header("Pool 프리팹")]
-    public GameObject tilePrefab;
-    public GameObject unitPrefab;
+    [SerializeField] private GameObject tilePrefab;
+    [SerializeField] private GameObject unitPrefab;
+    [SerializeField] private GameObject gameObjectivesUI; // 게임 목표 UI
 
     [Header("초기 풀 크기")]
     [SerializeField] private int InitialTileCount = 1024;
@@ -17,14 +19,17 @@ public class GameManager : MonoBehaviour
     private PoolingManager<Unit> unitPool;
 
     [Header("JSON Data")]
-    public TextAsset stageJsonFile;
-    public StageData currentStageData;
+    [SerializeField] private TextAsset stageJsonFile;
+    [SerializeField] private StageData currentStageData;
 
     [Header("선택된 유닛")]
     private Unit selectedUnit;
     private Tile selectedUnitTile;
 
     public bool isAutoBattle = false; // 아군 자동 전투 여부
+    private int maxTurnCount = 20; // 최대 턴 수
+    private bool isGameOver = false; // 게임 종료 여부
+
     private void Awake()
     {
         if(!Instance)
@@ -39,34 +44,48 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        StartCoroutine(StartGameSequence());
         InitializePooling();
-        LoadStage();
-        TurnManager.Instance.StartTurn();
+    }
+
+    /// <summary>
+    /// 게임이 시작될 때 첫 번째 스토리 이벤트 실행
+    /// </summary>
+    private IEnumerator StartGameSequence()
+    {
+        //yield return new WaitForSeconds(1f); // 씬 전환 후 로딩 대기
+
+        yield return StartCoroutine(PlayIntroEvent());
+
+        yield return new WaitForSeconds(0.5f);
+        // 게임 목표 UI 표시 (UIManager에서 처리)
+        UIManager.Instance.ShowGameObjectives();
+    }
+
+    /// <summary>
+    /// 게임 시작 전 이벤트(대화, 애니메이션) 실행
+    /// </summary>
+    private IEnumerator PlayIntroEvent()
+    {
+        DialogueManager.Instance.LoadDialogue("IntroStory");
+        DialogueManager.Instance.StartDialogue();
+
+        while (DialogueManager.Instance.IsDialogueActive())
+        {
+            yield return null;
+        }
+
+        //// 유닛 등장 연출 (선택적으로 추가 가능)
+        //Unit playerUnit = UnitManager.Instance.GetUnitsByType(101).Find(x => true);
+        //if (playerUnit != null)
+        //{
+        //    yield return StartCoroutine(playerUnit.MoveTo(GridManager.Instance.GetTile()));
+        //}
     }
 
     private void Update()
     {
-        ResultGame();
-
-        //// 자동 전투 토글
-        //if (Input.GetKeyDown(KeyCode.T))
-        //{
-        //    isAutoBattle = !isAutoBattle;
-        //    Debug.Log($"자동 전투 모드: {(isAutoBattle ? "ON" : "OFF")}");
-        //}
-
-        //if (Input.GetKeyDown(KeyCode.F))
-        //{
-        //    Debug.Log($"{selectedUnit.unitData.unitName}아군 턴 완료");
-        //    selectedUnit.unitState = E_UnitState.Complete;
-        //    selectedUnit = null;
-        //}
-
-        //if (Input.GetKeyDown(KeyCode.A))
-        //{
-        //    GridManager.Instance.FindAttackableTiles(selectedUnit);
-        //    GridManager.Instance.ShowHighLight();
-        //}
+        //ResultGame();
     }
 
     /// <summary>
@@ -244,5 +263,103 @@ public class GameManager : MonoBehaviour
             Debug.Log("패배!");
     }
 
-    // TODO : 다음 스테이지 로드
+    public void StartGame()
+    {
+        LoadStage();
+        Camera.main.transform.position = new Vector3(currentStageData.width / 2, currentStageData.height / 2, Camera.main.transform.position.z);
+        TurnManager.Instance.StartTurn();
+    }
+
+    public void CheckGameState()
+    {
+        if (isGameOver) return;
+
+        int playerUnits = UnitManager.Instance.GetPlayerUnits().Count;
+        int enemyUnits = UnitManager.Instance.GetEnemyUnits().Count;
+        int currentTurn = TurnManager.Instance.GetTurnCount();
+
+        // 승리 조건: 적군이 모두 제거됨
+        if (enemyUnits == 0)
+        {
+            StartCoroutine(HandleVictory());
+            return;
+        }
+
+        // 패배 조건: 아군이 모두 제거됨 또는 턴 초과 경과
+        if (playerUnits == 0 || currentTurn > maxTurnCount)
+        {
+            StartCoroutine(HandleDefeat());
+        }
+    }
+
+    /// <summary>
+    /// 승리 시 실행 (이벤트 후 다음 스테이지)
+    /// </summary>
+    private IEnumerator HandleVictory()
+    {
+        isGameOver = true;
+        UIManager.Instance.ShowVictoryUI();
+
+        // 이벤트 실행 (대화 및 캐릭터 애니메이션)
+        yield return StartCoroutine(PlayVictoryEvent());
+
+        // 다음 스테이지로 이동
+        LoadNextStage();
+    }
+
+    /// <summary>
+    /// 패배 시 실행 (UI 표시 및 선택지 제공)
+    /// </summary>
+    private IEnumerator HandleDefeat()
+    {
+        isGameOver = true;
+        UIManager.Instance.ShowDefeatUI();
+
+        yield return null; // UI에서 플레이어 선택 대기
+    }
+
+    /// <summary>
+    /// 승리 후 대화 및 애니메이션 실행
+    /// </summary>
+    private IEnumerator PlayVictoryEvent()
+    {
+        DialogueManager.Instance.LoadDialogue("VictoryStory");
+        DialogueManager.Instance.StartDialogue();
+
+        while (DialogueManager.Instance.IsDialogueActive())
+        {
+            yield return null;
+        }
+
+        //// 특정 유닛이 이동하는 연출
+        //Unit hero = UnitManager.Instance.GetUnitsByType(101).Find(x => true);
+        //if (hero != null)
+        //{
+        //    yield return StartCoroutine(hero.MoveTo(GridManager.Instance.GetTile(new Vector2Int(5, 5))));
+        //}
+    }
+
+    /// <summary>
+    /// 다음 스테이지 로드
+    /// </summary>
+    private void LoadNextStage()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
+
+    /// <summary>
+    /// 현재 스테이지 다시 시작
+    /// </summary>
+    public void RestartStage()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    /// <summary>
+    /// 메인 메뉴로 이동
+    /// </summary>
+    public void GoToMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
 }
