@@ -1,0 +1,29 @@
+{
+  "dialogues": [
+    {
+      "name": "하후돈",
+      "portrait": "Hahudon",
+      "text": "인트로 시작"
+    },
+    {
+      "name": "하후돈",
+      "portrait": "Hahudon",
+      "text": "인트로 중간1"
+    },
+    {
+      "name": "하후돈",
+      "portrait": "Hahudon",
+      "text": "인트로 중간2"
+    },
+    {
+      "name": "하후돈",
+      "portrait": "Hahudon",
+      "text": "인트로 중간3"
+    },
+    {
+      "name": "조조",
+      "portrait": "Jojo",
+      "text": "인트로 끝"
+    }
+  ]
+}
