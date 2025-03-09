@@ -175,8 +175,11 @@ public class InputManager : MonoBehaviour
     private void OnSelectPerformed(InputAction.CallbackContext context)
     {
         // 대화창이 활성화시 동작 X
-        if (isDialogueActive) return;
-
+        if (isDialogueActive)
+        {
+            DialogueManager.Instance.ShowNextDialogue();
+            return;
+        }
         Vector2 screenPos = Mouse.current.position.ReadValue();
         Vector3 worldPos = cam.ScreenToWorldPoint(new Vector3(screenPos.x, screenPos.y, cam.transform.position.z));
 

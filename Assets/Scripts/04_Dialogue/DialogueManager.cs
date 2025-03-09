@@ -9,6 +9,10 @@ public class DialogueManager : MonoBehaviour
     private Queue<DialogueEntry> dialogueQueue = new Queue<DialogueEntry>();
 
     [SerializeField] private DialogueUI dialogueUI;
+    
+    private bool isDialogueActive = false; // 대화 활성화 상태
+
+    private string dialogueName;
 
     private void Awake()
     {
@@ -32,10 +36,11 @@ public class DialogueManager : MonoBehaviour
     /// <param name="jsonFileName"></param>
     public void LoadDialogue(string jsonFileName)
     {
-        TextAsset  jsonFile = Resources.Load<TextAsset>($"Dialogues/{jsonFileName}");
+        dialogueName = jsonFileName;
+        TextAsset  jsonFile = Resources.Load<TextAsset>($"Dialogues/{dialogueName}");
         if(!jsonFile)
         {
-            Debug.LogError($"대화파일을 찾을 수 없습니다.{jsonFileName}");
+            Debug.LogError($"대화파일을 찾을 수 없습니다.{dialogueName}");
             return;
         }
 
@@ -60,7 +65,7 @@ public class DialogueManager : MonoBehaviour
             // 입력 및 UI 숨김
             InputManager.Instance.EnableDialogueActive();
             UIManager.Instance.HideActionMenu();
-            
+            isDialogueActive = true;
             // 다음 대화 시작
             ShowNextDialogue();
         }
@@ -74,6 +79,7 @@ public class DialogueManager : MonoBehaviour
         // 큐가 비었으면 대화 종료
         if (dialogueQueue.Count == 0)
         {
+            isDialogueActive = false;
             dialogueUI.HideDialogueBox();
             InputManager.Instance.DisableDialogueActive();
             UIManager.Instance.ShowActionMenu();
@@ -126,5 +132,20 @@ public class DialogueManager : MonoBehaviour
             }
             count++;
         }
+    }
+
+    public bool IsDialogueActive()
+    {
+        return isDialogueActive;
+    }
+
+    public void EnableIsDialogueActive()
+    {
+        isDialogueActive = true;
+    }
+
+    public void DisableIsDialogueActive()
+    {
+        isDialogueActive = false;
     }
 }

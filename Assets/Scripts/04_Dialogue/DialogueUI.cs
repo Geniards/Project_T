@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,6 +11,8 @@ public class DialogueUI : MonoBehaviour
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private TMP_Text dialogueText;
     [SerializeField] private Image portraitImage;
+
+    private StringBuilder stringBuilder = new StringBuilder();
 
     private void Awake()
     {
@@ -30,8 +33,13 @@ public class DialogueUI : MonoBehaviour
     {
         ShowDialogueBox();
 
-        nameText.text = name;
-        dialogueText.text = text;
+        if(nameText.text != name)
+        {
+            nameText.text = name;
+            dialogueText.text = text;
+        }
+        else
+            dialogueText.text = ConnectText(dialogueText.text, text);
 
         // 캐릭터 초상화 업데이트
         Sprite portraitSprite = Resources.Load<Sprite>($"Portraits/{portrait}");
@@ -49,5 +57,14 @@ public class DialogueUI : MonoBehaviour
     public void OnNextButtonClick()
     {
         DialogueManager.Instance.ShowNextDialogue();
+    }
+
+    private string ConnectText(string prevText, string nextText)
+    {
+        stringBuilder.Clear();
+        stringBuilder.Append(prevText);
+        stringBuilder.Append('\n');
+        stringBuilder.Append(nextText);
+        return stringBuilder.ToString();
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEditor;
@@ -10,13 +11,13 @@ public class UIManager : MonoBehaviour
     public static UIManager Instance { get; private set; }
 
     // 행동 선택 UI
-    [Header("버튼 프리펩")]
+    [Header("Action 메뉴 UI")]
     [SerializeField] private GameObject actionMenu;
     [SerializeField] private Button attackButton; // 공격 버튼
     [SerializeField] private Button waitButton;   // 대기 버튼
     [SerializeField] private Button cancelButton; // 취소 버튼
 
-    [Header("UI 텍스트")]
+    [Header("유닛 상태 UI")]
     [SerializeField] private GameObject unitStatusUI;
     [SerializeField] private TMP_Text hpTMP;
     [SerializeField] private TMP_Text manaTMP;
@@ -25,15 +26,23 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TMP_Text levelTMP;
     [SerializeField] private TMP_Text classTMP;
 
-    [Header("UI 슬라이더")]
+    [Header("유닛 체력바 UI")]
     [SerializeField] private Slider hpSlider;
     [SerializeField] private Slider manaSlider;
     [SerializeField] private Slider expSlider;
 
+    [SerializeField] private GameObject turnUI;  // 턴 UI
+    [SerializeField] private TMP_Text turnText;  // 턴 텍스트
+
+    [Header("UI Canvas")]
     [SerializeField] private CanvasGroup canvasGroup;
 
     [Header("UI 위치")]
     [SerializeField] private Vector3 uiPos;
+
+    [Header("게임 목표 UI")]
+    [SerializeField] private GameObject gameObjectivesUI;
+    [SerializeField] private TMP_Text gameObjectText;
 
     // 마지막으로 상태 UI를 표시한 유닛
     private Unit lastHoveredUnit;
@@ -44,6 +53,7 @@ public class UIManager : MonoBehaviour
     // 공격 취소 가능상태
     public bool isAttackMode { get; set; }
 
+    private bool isTurnUIActive = false;
 
     private void Awake()
     {
@@ -55,6 +65,12 @@ public class UIManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        // UI OFF
+        actionMenu.SetActive(false);
+        unitStatusUI.SetActive(false);
+        gameObjectivesUI.SetActive(false);
+        turnUI.SetActive(false);
     }
 
     private void Start()
@@ -70,6 +86,8 @@ public class UIManager : MonoBehaviour
     /// <param name="unit"></param>
     public void ShowActionMenu()
     {
+        if (!selectedUnit) return;
+
         actionMenu.SetActive(true);
         isActionMenuVisible = true;
 
@@ -219,5 +237,58 @@ public class UIManager : MonoBehaviour
     {
         if (expSlider)
             expSlider.value = Mathf.Clamp(unit.unitData.exp / unit.unitData.maxExp, 0f, 1f);
+    }
+
+    /// <summary>
+    /// 턴 시작 UI표시
+    /// </summary>
+    /// <param name="isPlayerTurn"></param>
+    /// <param name="turnNumber"></param>
+    /// <returns></returns>
+    public IEnumerator ShowTurnUI(bool isPlayerTurn, int turnNumber)
+    {
+        isTurnUIActive = true;
+        turnUI.SetActive(true);
+
+        if (isPlayerTurn)
+        {
+            turnText.text = $"아군 {turnNumber}턴";
+        }
+        else
+        {
+            turnText.text = $"적군 {turnNumber}턴";
+        }
+
+        yield return new WaitForSeconds(2f);
+
+        turnUI.SetActive(false);
+        isTurnUIActive = false;
+    }
+
+    public bool IsTurnUIActive()
+    {
+        return isTurnUIActive;
+    }
+
+    /// <summary>
+    /// 게임 목표 UI 표시
+    /// </summary>
+    public void ShowGameObjectives()
+    {
+        gameObjectivesUI.SetActive(true);
+    }
+
+    /// <summary>
+    /// 게임 목표 UI 숨기기
+    /// </summary>
+    public void HideGameObjectives()
+    {
+        gameObjectivesUI.SetActive(false);
+    }
+
+    public void OnGameStartButtonClick()
+    {
+        HideGameObjectives(); // 게임 목표 UI 닫기
+        GameManager.Instance.StartGame(); // 게임 시작
     }
 }
