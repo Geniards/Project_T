@@ -42,7 +42,17 @@ public class UIManager : MonoBehaviour
 
     [Header("게임 목표 UI")]
     [SerializeField] private GameObject gameObjectivesUI;
-    [SerializeField] private TMP_Text gameObjectText;
+    [SerializeField] private TMP_Text gameObjectVictoryTitleText;
+    [SerializeField] private TMP_Text gameObjectVictoryText;
+    [SerializeField] private TMP_Text gameObjectDefeatTitleText;
+    [SerializeField] private TMP_Text gameObjectDefeatText;
+
+    [Header("승리 UI / 패배 UI")]
+    [SerializeField] private GameObject resultUI;
+    [SerializeField] private Button nextStageButton;
+    [SerializeField] private Button retryButton;
+    [SerializeField] private Button mainMenuButton;
+    [SerializeField] private TMP_Text ResultText;
 
     // 마지막으로 상태 UI를 표시한 유닛
     private Unit lastHoveredUnit;
@@ -71,6 +81,7 @@ public class UIManager : MonoBehaviour
         unitStatusUI.SetActive(false);
         gameObjectivesUI.SetActive(false);
         turnUI.SetActive(false);
+        resultUI.SetActive(false);
     }
 
     private void Start()
@@ -78,6 +89,10 @@ public class UIManager : MonoBehaviour
         attackButton.onClick.AddListener(OnAttackButtonClick);
         waitButton.onClick.AddListener(OnWaitButtonClick);
         cancelButton.onClick.AddListener(OnCancelButtonClick);
+
+        nextStageButton.onClick.AddListener(OnNextStageButtonClick);
+        retryButton.onClick.AddListener(OnRetryButtonClick);
+        mainMenuButton.onClick.AddListener(OnMainMenuButtonClick);
     }
 
     /// <summary>
@@ -276,6 +291,10 @@ public class UIManager : MonoBehaviour
     public void ShowGameObjectives()
     {
         gameObjectivesUI.SetActive(true);
+        gameObjectVictoryTitleText.text = "승리 조건 :";
+        gameObjectVictoryText.text = "적군을 다 섬멸하라!";
+        gameObjectDefeatTitleText.text = "패배 조건 :";
+        gameObjectDefeatText.text = "아군이 다 죽으면 패배!";
     }
 
     /// <summary>
@@ -290,5 +309,50 @@ public class UIManager : MonoBehaviour
     {
         HideGameObjectives(); // 게임 목표 UI 닫기
         GameManager.Instance.StartGame(); // 게임 시작
+    }
+
+    /// <summary>
+    /// 승리 UI 표시
+    /// </summary>
+    public void ShowVictoryUI()
+    {
+        resultUI.SetActive(true);
+        ResultText.text = "전투 승리!";
+    }
+
+    /// <summary>
+    /// 패배 UI 표시
+    /// </summary>
+    public void ShowDefeatUI()
+    {
+        resultUI.SetActive(true);
+        ResultText.text = "전투 패배!";
+    }
+
+    public void ShowGameClearUI()
+    {
+        resultUI.SetActive(true);
+        ResultText.text = "모든 스테이지 클리어!";
+    }
+
+    private void OnNextStageButtonClick()
+    {
+        resultUI.SetActive(false);
+        ResultText.text = "";
+        GameManager.Instance.LoadNextStage();
+    }
+
+    private void OnRetryButtonClick()
+    {
+        resultUI.SetActive(false);
+        ResultText.text = "";
+        GameManager.Instance.RestartStage();
+    }
+
+    private void OnMainMenuButtonClick()
+    {
+        resultUI.SetActive(false);
+        ResultText.text = "";
+        GameManager.Instance.GoToMainMenu();
     }
 }
