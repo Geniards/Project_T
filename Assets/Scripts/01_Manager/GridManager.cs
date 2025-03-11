@@ -1,11 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
 
 public class GridManager : MonoBehaviour
 {
@@ -85,8 +82,8 @@ public class GridManager : MonoBehaviour
                     tile.SetTilePosition(position);
                     tile.SetTileProperties(tileInfo.walkable, Enum.Parse<E_TileType>(tileInfo.type));
 
-                    if (!tile.isWalkable)
-                        tile.defaultColor = new Color(0, 0, 1f);
+                    //if (!tile.isWalkable)
+                    //    tile.defaultColor = new Color(0, 0, 1f);
 
                     tileDictionary[position] = tile;
                 }
