@@ -3,26 +3,31 @@
     {
       "name": "하후돈",
       "portrait": "Hahudon",
+      "BG": "BG20",
       "text": "인트로 시작"
     },
     {
       "name": "하후돈",
       "portrait": "Hahudon",
+      "BG": "BG20",
       "text": "인트로 중간1"
     },
     {
       "name": "하후돈",
       "portrait": "Hahudon",
+      "BG": "BG20",
       "text": "인트로 중간2"
     },
     {
       "name": "하후돈",
       "portrait": "Hahudon",
+      "BG": "BG24",
       "text": "인트로 중간3"
     },
     {
       "name": "조조",
       "portrait": "Jojo",
+      "BG": "BG23",
       "text": "인트로 끝"
     }
   ]

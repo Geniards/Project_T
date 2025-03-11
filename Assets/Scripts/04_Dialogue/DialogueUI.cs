@@ -11,12 +11,14 @@ public class DialogueUI : MonoBehaviour
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private TMP_Text dialogueText;
     [SerializeField] private Image portraitImage;
+    [SerializeField] private Image bgImage;
 
     private StringBuilder stringBuilder = new StringBuilder();
 
     private void Awake()
     {
         HideDialogueBox();
+        bgImage.gameObject.SetActive(false);
     }
 
     public void ShowDialogueBox()
@@ -27,13 +29,14 @@ public class DialogueUI : MonoBehaviour
     public void HideDialogueBox()
     {
         dialogueBox.SetActive(false);
+        bgImage.gameObject.SetActive(false);
     }
 
-    public void UpdateDialogue(string name, string portrait, string text)
+    public void UpdateDialogue(string name, string portrait, string bg, string text)
     {
         ShowDialogueBox();
 
-        if(nameText.text != name)
+        if (nameText.text != name)
         {
             nameText.text = name;
             dialogueText.text = text;
@@ -50,6 +53,26 @@ public class DialogueUI : MonoBehaviour
         else
         {
             Debug.LogWarning($"초상화 이미지 없음: {portrait}");
+        }
+
+        // 배경 이미지 업데이트
+        if (!string.IsNullOrEmpty(bg))
+        {
+            Sprite bgSprite = Resources.Load<Sprite>($"Backgrounds/{bg}");
+            if (bgSprite != null)
+            {
+                bgImage.sprite = bgSprite;
+                bgImage.gameObject.SetActive(true);
+            }
+            else
+            {
+                Debug.LogWarning($"배경 이미지 없음: {bg}");
+                bgImage.gameObject.SetActive(false);
+            }
+        }
+        else
+        {
+            bgImage.gameObject.SetActive(false); // BG 데이터가 없으면 배경 숨김
         }
     }
 

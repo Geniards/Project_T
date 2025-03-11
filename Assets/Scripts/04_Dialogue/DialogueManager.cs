@@ -22,14 +22,6 @@ public class DialogueManager : MonoBehaviour
             Destroy(gameObject);
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            dialogueUI.OnNextButtonClick();
-        }
-    }
-
     /// <summary>
     /// Json에서 대화 데이터 로드
     /// </summary>
@@ -88,7 +80,7 @@ public class DialogueManager : MonoBehaviour
         // 다음 대사를 꺼냄
         DialogueEntry entry = dialogueQueue.Dequeue();
         // 1) 대사 표시
-        dialogueUI.UpdateDialogue(entry.name, entry.portrait, entry.text);
+        dialogueUI.UpdateDialogue(entry.name, entry.portrait, entry.BG, entry.text);
 
         // 2) 만약 유닛 애니메이션 정보를 가지고 있으면 실행
         if (entry.unitId != 0)

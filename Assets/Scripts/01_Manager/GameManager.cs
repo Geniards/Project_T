@@ -27,6 +27,8 @@ public class GameManager : MonoBehaviour
     private Tile selectedUnitTile;
 
     public bool isAutoBattle = false; // 아군 자동 전투 여부
+
+    private int currentStageIndex = 0; // 현재 스테이지 ID저장
     private int maxTurnCount = 20; // 최대 턴 수
     private bool isGameOver = false; // 게임 종료 여부
 
@@ -130,13 +132,25 @@ public class GameManager : MonoBehaviour
     {
         unitPool.ReturnObject(unit);
     }
-    public void LoadStage()
+
+    /// <summary>
+    /// 현재 스테이지 로드 (처음 시작 or 다시 시작)
+    /// </summary>
+    /// <param name="stageIndex"></param>
+    public void LoadStage(int stageIndex)
     {
+        isGameOver = false;
+        currentStageIndex = stageIndex;
+
         // 기존 데이터 초기화
         ResetStage();
 
         // 스테이지 데이터 로드
-        currentStageData = JsonUtility.FromJson<StageData>(stageJsonFile.text);
+        string stageFileName = $"StageData_{stageIndex}";
+        Debug.Log(stageFileName);
+        TextAsset stageJson = Resources.Load<TextAsset>($"StageData_{stageIndex}");
+        currentStageData = JsonUtility.FromJson<StageData>(stageJson.text);
+
 
         // 타일 정보 Dictionary 변환
         currentStageData.ConvertTileLegend();
@@ -265,7 +279,14 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
-        LoadStage();
+        isGameOver = false;
+        // 현재 진행 중인 스테이지가 없으면 첫 번째 스테이지부터 시작
+        if (currentStageIndex == 0)
+        {
+            currentStageIndex = 1;
+        }
+
+        LoadStage(currentStageIndex);
         Camera.main.transform.position = new Vector3(currentStageData.width / 2, currentStageData.height / 2, Camera.main.transform.position.z);
         TurnManager.Instance.StartTurn();
     }
@@ -302,9 +323,6 @@ public class GameManager : MonoBehaviour
 
         // 이벤트 실행 (대화 및 캐릭터 애니메이션)
         yield return StartCoroutine(PlayVictoryEvent());
-
-        // 다음 스테이지로 이동
-        LoadNextStage();
     }
 
     /// <summary>
@@ -323,7 +341,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private IEnumerator PlayVictoryEvent()
     {
-        DialogueManager.Instance.LoadDialogue("VictoryStory");
+        DialogueManager.Instance.LoadDialogue($"VictoryStage_{currentStageIndex}");
         DialogueManager.Instance.StartDialogue();
 
         while (DialogueManager.Instance.IsDialogueActive())
@@ -342,9 +360,20 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// 다음 스테이지 로드
     /// </summary>
-    private void LoadNextStage()
+    public void LoadNextStage()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        int nextStageIndex = currentStageIndex + 1;
+        TextAsset nextStageJson = Resources.Load<TextAsset>($"StageData_{nextStageIndex}");
+        Debug.Log(nextStageJson);
+        if (nextStageJson == null)
+        {
+            Debug.Log("모든 스테이지를 클리어했습니다! 게임 종료 또는 메인 메뉴로 이동.");
+            UIManager.Instance.ShowGameClearUI();
+            return;
+        }
+
+        // 같은 씬에서 다음 스테이지 데이터 로드
+        LoadStage(nextStageIndex);
     }
 
     /// <summary>
@@ -352,7 +381,8 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void RestartStage()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        LoadStage(currentStageIndex);
     }
 
     /// <summary>
@@ -360,6 +390,6 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void GoToMainMenu()
     {
-        SceneManager.LoadScene("MainMenu");
+        SceneManager.LoadScene("00_Start");
     }
 }
