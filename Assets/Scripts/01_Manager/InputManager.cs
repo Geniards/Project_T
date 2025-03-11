@@ -75,8 +75,6 @@ public class InputManager : MonoBehaviour
         zoomAction.performed += ZoomCamera;
         inputActions.Click.Enable();
 
-
-
         // 유닛 선택 및 Undo
         selectAction = inputActions.Click.Select;
         selectAction.performed += OnSelectPerformed;
@@ -89,9 +87,6 @@ public class InputManager : MonoBehaviour
         rightClickAction = inputActions.Click.RightClick;
         rightClickAction.performed += HandleRightClick;
         rightClickAction.Enable();
-        
-
-
     }
 
     private void OnDisable()
@@ -103,11 +98,11 @@ public class InputManager : MonoBehaviour
     {
         // 키보드 입력
         GetKeyboardMovenet();
-        //CheckMouseAtScreenEdge();
+        CheckMouseAtScreenEdge();
 
         // 속도 업데이트 및 위치 업데이트
         UpdateVelocity();
-        UpdateCameraPos();
+        //UpdateCameraPos();
         UpdateBasePosition();
     }
 
@@ -215,9 +210,9 @@ public class InputManager : MonoBehaviour
     {
         if (isDialogueActive) return;
 
-        float zoomInput = -context.ReadValue<Vector2>().y / 100f;
+        float zoomInput = -context.ReadValue<Vector2>().y / 1000f;
 
-        if(Mathf.Abs(zoomInput) > 0.1f)
+        if(Mathf.Abs(zoomInput) > 0.01f)
         {
             float newSize = cam.orthographicSize + zoomInput * stepSize;
             cam.orthographicSize = Mathf.Clamp(newSize, minHeight, maxHeight);
