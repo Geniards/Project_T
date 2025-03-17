@@ -59,7 +59,7 @@ public class GameManager : MonoBehaviour
 
         yield return StartCoroutine(PlayIntroEvent());
 
-        yield return new WaitForSeconds(0.5f);
+        //yield return new WaitForSeconds(0.1f);
         // 게임 목표 UI 표시 (UIManager에서 처리)
         UIManager.Instance.ShowGameObjectives();
     }
@@ -379,6 +379,7 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        ResetGameState();
         // 같은 씬에서 다음 스테이지 데이터 로드
         LoadStage(nextStageIndex);
     }
@@ -389,6 +390,7 @@ public class GameManager : MonoBehaviour
     public void RestartStage()
     {
         //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        ResetGameState(); 
         LoadStage(currentStageIndex);
     }
 
@@ -399,4 +401,32 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.LoadScene("00_Start");
     }
+
+    /// <summary>
+    /// 게임 상태 완전 초기화
+    /// </summary>
+    private void ResetGameState()
+    {
+        // UI 초기화
+        UIManager.Instance.HideActionMenu();
+        UIManager.Instance.HideGameObjectives();
+
+        // 유닛 데이터 초기화
+        UnitManager.Instance.ResetUnits();
+
+        // 타일 데이터 초기화
+        GridManager.Instance.ResetGrid();
+
+        // 선택된 유닛 초기화
+        selectedUnit = null;
+        selectedUnitTile = null;
+
+        // 게임 변수 초기화
+        isGameOver = false;
+        currentStageIndex = 0;
+
+        // 모든 UI 요소 초기화
+        UIManager.Instance.ClearAllUI();
+    }
+
 }

@@ -48,10 +48,12 @@ public class DialogueUI : MonoBehaviour
         Sprite portraitSprite = Resources.Load<Sprite>($"Portraits/{portrait}");
         if (portraitSprite != null)
         {
+            portraitImage.enabled = true;
             portraitImage.sprite = portraitSprite;
         }
         else
         {
+            portraitImage.enabled = false;
             Debug.LogWarning($"초상화 이미지 없음: {portrait}");
         }
 
