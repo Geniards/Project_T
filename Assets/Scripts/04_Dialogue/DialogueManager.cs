@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,7 +10,8 @@ public class DialogueManager : MonoBehaviour
     private Queue<DialogueEntry> dialogueQueue = new Queue<DialogueEntry>();
 
     [SerializeField] private DialogueUI dialogueUI;
-    
+    [SerializeField] private float cameraMoveSpeed = 3f;
+
     private bool isDialogueActive = false; // 대화 활성화 상태
 
     private string dialogueName;
@@ -58,9 +60,47 @@ public class DialogueManager : MonoBehaviour
             InputManager.Instance.EnableDialogueActive();
             UIManager.Instance.HideActionMenu();
             isDialogueActive = true;
+
+            // 첫 번째 대화 유닛 확인 후 카메라 이동
+            DialogueEntry entry = dialogueQueue.Peek();
+            if (entry.unitId != 0)
+            {
+                Unit targetUnit = UnitManager.Instance.GetUnitsByType(entry.unitId).Find(x => true);
+                if (targetUnit)
+                {
+                    StartCoroutine(MoveCameraToUnit(targetUnit, () =>
+                    {
+                        Debug.Log("이벤트 대화 동작!");
+                        ShowNextDialogue();
+                    }));
+                    return; // 카메라 이동 후 대화 진행
+                }
+            }
+
             // 다음 대화 시작
             ShowNextDialogue();
         }
+    }
+
+    /// <summary>
+    /// 카메라를 특정 유닛에게 이동 (연출 후 콜백 실행)
+    /// </summary>
+    private IEnumerator MoveCameraToUnit(Unit unit, Action onComplete)
+    {
+        Camera mainCamera = Camera.main;
+        Vector3 targetPosition = new Vector3(unit.transform.position.x, unit.transform.position.y, mainCamera.transform.position.z);
+        Vector3 startPosition = mainCamera.transform.position;
+
+        float elapsedTime = 0f;
+        while (elapsedTime < 1f)
+        {
+            elapsedTime += Time.deltaTime * cameraMoveSpeed;
+            mainCamera.transform.position = Vector3.Lerp(startPosition, targetPosition, elapsedTime);
+            yield return null;
+        }
+
+        mainCamera.transform.position = targetPosition; // 최종 위치 고정
+        onComplete?.Invoke(); // 이동 후 대화 시작
     }
 
     /// <summary>
@@ -85,18 +125,20 @@ public class DialogueManager : MonoBehaviour
         // 2) 만약 유닛 애니메이션 정보를 가지고 있으면 실행
         if (entry.unitId != 0)
         {
+            Debug.Log("대화 중 유닛 이동");
             // 여러 유닛이 같은 unitId를 가질 수도 있으니,
             // 우선 GetUnitsByType().Find(...) 등을 써서 대상 유닛을 잡는다.
             Unit targetUnit = UnitManager.Instance.GetUnitsByType(entry.unitId).Find(x => true); // 조건 필요시 추가
-            if (targetUnit != null)
+            if (targetUnit)
             {
+                Debug.Log("targetUnit not null");
                 // 코루틴으로 애니메이션(또는 연출)을 재생
-                StartCoroutine(PlayStoryAnimation(targetUnit, entry.animationType, entry.repeatCount));
+                StartCoroutine(PlayStoryAnimation(targetUnit, entry.animationType, entry.repeatCount, entry.targetX, entry.targetY));
             }
         }
     }
 
-    private IEnumerator PlayStoryAnimation(Unit unit, string animType, int repeatCount)
+    private IEnumerator PlayStoryAnimation(Unit unit, string animType, int repeatCount, int targetX, int targetY)
     {
         int count = 0;
         while (repeatCount == 0 || count < repeatCount)
@@ -109,11 +151,12 @@ public class DialogueManager : MonoBehaviour
                     break;
 
                 case "Move":
-                    Tile randomTile = GridManager.Instance.GetTile(unit.currentTile.vec2IntPos + Vector2Int.right);
-                    if (randomTile != null)
+                    Tile targetTile = GridManager.Instance.GetTile(new Vector2Int(targetX, targetY));
+                    Tile initTile = unit.currentTile;
+                    if (targetTile)
                     {
-                        unit.MoveTo(randomTile);
-                        yield return new WaitForSeconds(1.5f);
+                        Debug.Log("유닛 조건문 동작");
+                        yield return StartCoroutine(unit.MoveToCoroutine(targetTile));
                     }
                     break;
 

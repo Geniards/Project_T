@@ -18,4 +18,7 @@ public class DialogueEntry
     public int unitId;           // 연출할 유닛 ID (없으면 -1 또는 0)
     public string animationType; // "Attack", "Idle", "Victory" 등
     public int repeatCount;      // 몇 번 반복할지 (1=한 번, 0=무한루프, n= n번)
+
+    public int targetX;
+    public int targetY;
 }

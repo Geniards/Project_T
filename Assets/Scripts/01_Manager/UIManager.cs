@@ -160,6 +160,7 @@ public class UIManager : MonoBehaviour
         selectedUnit.unitState = E_UnitState.Complete;
         HideActionMenu();
         selectedUnit = null;
+        GameManager.Instance.selectedUnit = selectedUnit;
         TurnManager.Instance.CheckPlayerTurnEnd();
 
     }
@@ -167,6 +168,7 @@ public class UIManager : MonoBehaviour
     private void OnCancelButtonClick()
     {
         selectedUnit.Deselect();
+        selectedUnit = null;
         HideActionMenu();
     }
 
