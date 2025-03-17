@@ -15,5 +15,7 @@ MonoBehaviour:
   unitAnimations:
   - {fileID: 11400000, guid: b5f2036cb8a8cd3409c4f7e7ee12c3d8, type: 2}
   - {fileID: 11400000, guid: 22bd23d58a78e7b45b2d61d33f424dfd, type: 2}
+  - {fileID: 11400000, guid: bbebe25d4c1a75b40affacdbf323283a, type: 2}
+  - {fileID: 11400000, guid: 6f47e1e831fe04d4798e20d1947b644f, type: 2}
   - {fileID: 11400000, guid: 74d14e68f80ff454e9a4039e9a827888, type: 2}
   - {fileID: 11400000, guid: ec5a16fd1571acc4883798b1d1b31c07, type: 2}
