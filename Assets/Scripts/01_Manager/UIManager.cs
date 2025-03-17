@@ -54,6 +54,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button mainMenuButton;
     [SerializeField] private TMP_Text ResultText;
 
+    [Header("볼륨 슬라이더")]
+    [SerializeField] private Slider bgmSlider;
+    [SerializeField] private Slider sfxSlider;
+
     // 마지막으로 상태 UI를 표시한 유닛
     private Unit lastHoveredUnit;
 
@@ -322,6 +326,11 @@ public class UIManager : MonoBehaviour
         ResultText.text = "전투 승리!";
     }
 
+    public void HideVictoryUI()
+    {
+        resultUI.SetActive(false);
+    }
+
     /// <summary>
     /// 패배 UI 표시
     /// </summary>
@@ -329,6 +338,11 @@ public class UIManager : MonoBehaviour
     {
         resultUI.SetActive(true);
         ResultText.text = "전투 패배!";
+    }
+
+    public void HideDefeatUI()
+    {
+        resultUI.SetActive(false);
     }
 
     public void ShowGameClearUI()
@@ -356,5 +370,16 @@ public class UIManager : MonoBehaviour
         resultUI.SetActive(false);
         ResultText.text = "";
         GameManager.Instance.GoToMainMenu();
+    }
+
+    /// <summary>
+    /// 모든 UI 초기화
+    /// </summary>
+    public void ClearAllUI()
+    {
+        HideActionMenu();
+        HideGameObjectives();
+        HideVictoryUI();
+        HideDefeatUI();
     }
 }
