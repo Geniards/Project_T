@@ -98,7 +98,7 @@ public class InputManager : MonoBehaviour
     {
         // 키보드 입력
         GetKeyboardMovenet();
-        CheckMouseAtScreenEdge();
+        //CheckMouseAtScreenEdge();
 
         // 속도 업데이트 및 위치 업데이트
         UpdateVelocity();

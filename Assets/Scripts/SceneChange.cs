@@ -13,7 +13,7 @@ public class SceneChange : MonoBehaviour
 
     private void Start()
     {
-       // StartCoroutine(ChangeBackgroundImage());
+       StartCoroutine(ChangeBackgroundImage());
     }
 
     /// <summary>

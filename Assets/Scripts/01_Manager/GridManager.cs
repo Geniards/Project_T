@@ -201,6 +201,7 @@ public class GridManager : MonoBehaviour
     {
         foreach (var tile in walkableTiles)
         {
+            if (!attackableTiles.Contains(tile))
             tile.ClearHighlight();
         }
         walkableTiles.Clear();
