@@ -92,9 +92,7 @@ public class Unit : MonoBehaviour
         isSelected = false;
         currentTile.ClearHighlight();
         GridManager.Instance.ClearWalkableTiles();
-        //GridManager.Instance.ClearAttackableTiles();
-
-        //animation - mov01
+        GridManager.Instance.GetTile(this.previousPosition).ClearHighlight();
     }
 
     /// <summary>
@@ -113,6 +111,43 @@ public class Unit : MonoBehaviour
         {
             StartCoroutine(MoveAlongPath(path));
         }
+    }
+
+    public IEnumerator MoveToCoroutine(Tile targetTile)
+    {
+        if (targetTile == null) yield break;
+
+        List<Tile> path = GridManager.Instance.FindPathAStar(currentTile, targetTile);
+
+        // 경로의 각 타일로 한 칸씩 이동
+        foreach (Tile tile in path)
+        {
+            // 이동 방향 계산
+            Vector2Int direction = tile.vec2IntPos - currentTile.vec2IntPos;
+            unitAnimator.PlayMoveAnimation(direction); // 방향에 맞는 이동 애니메이션 실행
+
+            // 타일 이동(부드럽게 이동)
+            Vector3 startPos = transform.position;
+            Vector3 endPos = tile.transform.position;
+            float elapsedTime = 0f;
+            float moveDuration = 0.3f; // 이동 속도 조절
+
+            while (elapsedTime < moveDuration)
+            {
+                transform.position = Vector3.Lerp(startPos, endPos, (elapsedTime / moveDuration));
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+
+            transform.position = endPos;
+            currentTile = tile;
+            currentTile.isOccupied = false;
+
+            // 한 칸 이동 후 멈춤 효과
+            yield return new WaitForSeconds(0.2f);
+        }
+
+        GridManager.Instance.GetTile(this.previousPosition).ClearHighlight();
     }
 
     /// <summary>
