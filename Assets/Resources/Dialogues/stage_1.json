@@ -4,13 +4,25 @@
       "name": "조조",
       "portrait": "Jojo",
       "BG": "",
-      "text": "뭐라고 적어야할까?"
+      "text": "적군을 유인해서 처리하도록 하자!"
+    },
+    {
+      "name": "조조",
+      "portrait": "Jojo",
+      "BG": "",
+      "text": "하후돈 준비 되었는가?"
     },
     {
       "name": "하후돈",
       "portrait": "Hahudon",
       "BG": "",
-      "text": "그르게.. 머라고 적어야할까?"
+      "text": "네!! 준비 완료 되었습니다."
+    },
+    {
+      "name": "하후돈",
+      "portrait": "Hahudon",
+      "BG": "",
+      "text": "이놈들 내가 간다!!"
     }
   ]
 }

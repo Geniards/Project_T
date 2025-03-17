@@ -4,31 +4,37 @@
       "name": "하후돈",
       "portrait": "Hahudon",
       "BG": "BG20",
-      "text": "인트로 시작"
+      "text": "영천에 황건적 출현했다고 합니다."
     },
     {
       "name": "하후돈",
       "portrait": "Hahudon",
       "BG": "BG20",
-      "text": "인트로 중간1"
+      "text": "이건 기회이니 저희가 출전해서 전공을 얻어야합니다."
+    },
+    {
+      "name": "조조",
+      "portrait": "Jojo",
+      "BG": "BG20",
+      "text": "전군 준비는 끝난건가?"
     },
     {
       "name": "하후돈",
       "portrait": "Hahudon",
       "BG": "BG20",
-      "text": "인트로 중간2"
-    },
-    {
-      "name": "하후돈",
-      "portrait": "Hahudon",
-      "BG": "BG24",
-      "text": "인트로 중간3"
+      "text": "전군 준비 완료 되었습니다."
     },
     {
       "name": "조조",
       "portrait": "Jojo",
       "BG": "BG23",
-      "text": "인트로 끝"
+      "text": "그러면 전군 출전하도록 하지."
+    },
+    {
+      "name": "조조",
+      "portrait": "Jojo",
+      "BG": "BG23",
+      "text": "전군 출격!"
     }
   ]
 }
