@@ -143,4 +143,27 @@ public class TurnManager : MonoBehaviour
     {
         return turnCount;
     }
+
+
+    /// <summary>
+    /// 적군 행동 순서를 랜덤하게 변경
+    /// </summary>
+    /// <param name="enemyQueue"></param>
+    private void ShuffleEnemyQueue(Queue<Unit> enemyQueue)
+    {
+        List<Unit> enemyList = new List<Unit>(enemyQueue);
+
+        // Fisher-Yates Shuffle
+        for (int i = enemyList.Count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            (enemyList[i], enemyList[j]) = (enemyList[j], enemyList[i]); // Swap
+        }
+
+        enemyQueue.Clear();
+        foreach (Unit unit in enemyList)
+        {
+            enemyQueue.Enqueue(unit);
+        }
+    }
 }
