@@ -380,6 +380,9 @@ public class Unit : MonoBehaviour
         Debug.Log($"{unitData.unitId} 사망!");
         currentTile.isOccupied = false;
         UnitManager.Instance.RemoveUnit(this);
+
+        // 즉시 게임 상태 확인 (승리/패배 판정)
+        GameManager.Instance.CheckGameState();
     }
 
     /// <summary>

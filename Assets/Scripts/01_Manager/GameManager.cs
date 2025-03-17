@@ -23,8 +23,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private StageData currentStageData;
 
     [Header("선택된 유닛")]
-    private Unit selectedUnit;
     private Tile selectedUnitTile;
+    public Unit selectedUnit { get; set; }
 
     public bool isAutoBattle = false; // 아군 자동 전투 여부
 
@@ -319,10 +319,22 @@ public class GameManager : MonoBehaviour
     private IEnumerator HandleVictory()
     {
         isGameOver = true;
-        UIManager.Instance.ShowVictoryUI();
 
-        // 이벤트 실행 (대화 및 캐릭터 애니메이션)
-        yield return StartCoroutine(PlayVictoryEvent());
+        string victoryDialogue = $"VictoryStage_{currentStageIndex}";
+        TextAsset dialogueFile = Resources.Load<TextAsset>($"Dialogues/{victoryDialogue}");
+
+        if (dialogueFile != null)
+        {
+            //대화 이벤트 실행
+            DialogueManager.Instance.LoadDialogue(victoryDialogue);
+            DialogueManager.Instance.StartDialogue();
+
+            while (DialogueManager.Instance.IsDialogueActive())
+            {
+                yield return null;
+            }
+        }
+        UIManager.Instance.ShowVictoryUI();
     }
 
     /// <summary>
@@ -331,30 +343,25 @@ public class GameManager : MonoBehaviour
     private IEnumerator HandleDefeat()
     {
         isGameOver = true;
-        UIManager.Instance.ShowDefeatUI();
 
-        yield return null; // UI에서 플레이어 선택 대기
-    }
+        // 대화 이벤트가 존재하는지 확인
+        string defeatDialogue = $"DefeatStage_{currentStageIndex}";
+        TextAsset dialogueFile = Resources.Load<TextAsset>($"Dialogues/{defeatDialogue}");
 
-    /// <summary>
-    /// 승리 후 대화 및 애니메이션 실행
-    /// </summary>
-    private IEnumerator PlayVictoryEvent()
-    {
-        DialogueManager.Instance.LoadDialogue($"VictoryStage_{currentStageIndex}");
-        DialogueManager.Instance.StartDialogue();
-
-        while (DialogueManager.Instance.IsDialogueActive())
+        if (dialogueFile != null)
         {
-            yield return null;
+            // 대화 이벤트 실행
+            DialogueManager.Instance.LoadDialogue(defeatDialogue);
+            DialogueManager.Instance.StartDialogue();
+
+            while (DialogueManager.Instance.IsDialogueActive())
+            {
+                yield return null;
+            }
         }
 
-        //// 특정 유닛이 이동하는 연출
-        //Unit hero = UnitManager.Instance.GetUnitsByType(101).Find(x => true);
-        //if (hero != null)
-        //{
-        //    yield return StartCoroutine(hero.MoveTo(GridManager.Instance.GetTile(new Vector2Int(5, 5))));
-        //}
+        // 대화 이벤트가 끝나면 결과창 표시
+        UIManager.Instance.ShowDefeatUI();
     }
 
     /// <summary>
