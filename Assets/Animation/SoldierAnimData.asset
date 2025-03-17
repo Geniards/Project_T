@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f73f69fc6636c8d409ad5b23e81efa46, type: 3}
   m_Name: SoldierAnimData
   m_EditorClassIdentifier: 
-  unitTypeId: 2
+  unitTypeId: 3
   overrideController: {fileID: 22100000, guid: 27c0f54b42774b14a9489920e83428b7, type: 2}
   IdleHash: 2081823275
   InjuredIdleHash: 914324954
