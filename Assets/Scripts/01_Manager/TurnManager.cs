@@ -166,4 +166,10 @@ public class TurnManager : MonoBehaviour
             enemyQueue.Enqueue(unit);
         }
     }
+
+    public void ResetTurn()
+    {
+        turnCount = 1;
+        isPlayerTurn = true;
+    }
 }

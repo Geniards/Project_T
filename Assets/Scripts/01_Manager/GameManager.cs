@@ -55,11 +55,8 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private IEnumerator StartGameSequence()
     {
-        //yield return new WaitForSeconds(1f); // 씬 전환 후 로딩 대기
-
         yield return StartCoroutine(PlayIntroEvent());
 
-        //yield return new WaitForSeconds(0.1f);
         // 게임 목표 UI 표시 (UIManager에서 처리)
         UIManager.Instance.ShowGameObjectives();
     }
@@ -69,7 +66,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private IEnumerator PlayIntroEvent()
     {
-        DialogueManager.Instance.LoadDialogue("IntroStory");
+        DialogueManager.Instance.LoadDialogue("StageDialogue_1");
         DialogueManager.Instance.StartDialogue();
 
         while (DialogueManager.Instance.IsDialogueActive())
@@ -146,14 +143,20 @@ public class GameManager : MonoBehaviour
         ResetStage();
 
         // 스테이지 데이터 로드
-        string stageFileName = $"StageData_{stageIndex}";
+        string stageFileName = $"StageData_{currentStageIndex}";
         Debug.Log(stageFileName);
-        TextAsset stageJson = Resources.Load<TextAsset>($"StageData_{stageIndex}");
+        TextAsset stageJson = Resources.Load<TextAsset>($"StageData_{currentStageIndex}");
         currentStageData = JsonUtility.FromJson<StageData>(stageJson.text);
-
 
         // 타일 정보 Dictionary 변환
         currentStageData.ConvertTileLegend();
+
+        // 스테이지별 BGM 변경
+        AudioClip stageBGM = Resources.Load<AudioClip>($"Audio/{currentStageData.bgmFileName}");
+        if (stageBGM != null)
+        {
+            SoundManager.Instance.PlayBGM(stageBGM);
+        }
 
         // 그리드 및 유닛 배치
         GridManager.Instance.LoadGrid(currentStageData);
@@ -334,6 +337,8 @@ public class GameManager : MonoBehaviour
                 yield return null;
             }
         }
+        SoundManager.Instance.PlaySFX(SoundManager.Instance.victorySFX);
+        UIManager.Instance.HideActionMenu();
         UIManager.Instance.ShowVictoryUI();
     }
 
@@ -361,6 +366,8 @@ public class GameManager : MonoBehaviour
         }
 
         // 대화 이벤트가 끝나면 결과창 표시
+        SoundManager.Instance.PlaySFX(SoundManager.Instance.defeatSFX);
+        UIManager.Instance.HideActionMenu();
         UIManager.Instance.ShowDefeatUI();
     }
 
@@ -381,7 +388,9 @@ public class GameManager : MonoBehaviour
 
         ResetGameState();
         // 같은 씬에서 다음 스테이지 데이터 로드
+
         LoadStage(nextStageIndex);
+        StartCoroutine(StartStageDialogue(nextStageIndex));
     }
 
     /// <summary>
@@ -389,6 +398,8 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void RestartStage()
     {
+        UIManager.Instance.HideActionMenu();
+
         //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         ResetGameState(); 
         LoadStage(currentStageIndex);
@@ -399,6 +410,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void GoToMainMenu()
     {
+        currentStageIndex = 0;
         SceneManager.LoadScene("00_Start");
     }
 
@@ -408,8 +420,9 @@ public class GameManager : MonoBehaviour
     private void ResetGameState()
     {
         // UI 초기화
+        UIManager.Instance.ClearAllUI();
+        UIManager.Instance.CancelAttackMode();
         UIManager.Instance.HideActionMenu();
-        UIManager.Instance.HideGameObjectives();
 
         // 유닛 데이터 초기화
         UnitManager.Instance.ResetUnits();
@@ -420,13 +433,35 @@ public class GameManager : MonoBehaviour
         // 선택된 유닛 초기화
         selectedUnit = null;
         selectedUnitTile = null;
+        UIManager.Instance.selectedUnit = null;
 
         // 게임 변수 초기화
         isGameOver = false;
-        currentStageIndex = 0;
 
         // 모든 UI 요소 초기화
-        UIManager.Instance.ClearAllUI();
+        TurnManager.Instance.ResetTurn();
     }
 
+    /// <summary>
+    /// 스테이지 시작 시 대화 이벤트 실행
+    /// </summary>
+    private IEnumerator StartStageDialogue(int stageIndex)
+    {
+        string dialogueFileName = $"StageDialogue_{stageIndex}";
+        TextAsset dialogueFile = Resources.Load<TextAsset>($"Dialogues/{dialogueFileName}");
+
+        if (dialogueFile != null)
+        {
+            DialogueManager.Instance.LoadDialogue(dialogueFileName);
+            DialogueManager.Instance.StartDialogue();
+
+            while (DialogueManager.Instance.IsDialogueActive())
+            {
+                yield return null; // 대화가 끝날 때까지 대기
+            }
+        }
+
+        // 대화 종료 후 게임 목표 UI 표시
+        UIManager.Instance.ShowGameObjectives();
+    }
 }
