@@ -9,7 +9,6 @@ public class GameManager : MonoBehaviour
     [Header("Pool 프리팹")]
     [SerializeField] private GameObject tilePrefab;
     [SerializeField] private GameObject unitPrefab;
-    [SerializeField] private GameObject gameObjectivesUI; // 게임 목표 UI
 
     [Header("초기 풀 크기")]
     [SerializeField] private int InitialTileCount = 1024;
@@ -46,6 +45,15 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        // 씬이 전환된 후 LoadStage가 완료되었을 때 저장된 데이터 적용
+        if (SaveLoadManager.Instance.HasPendingLoadData())
+        {
+            InitializePooling();
+            Debug.Log("저장된 데이터 적용 시작...");
+            SaveLoadManager.Instance.ApplyLoadedData();
+            return;
+        }
+
         StartCoroutine(StartGameSequence());
         InitializePooling();
     }
@@ -73,13 +81,6 @@ public class GameManager : MonoBehaviour
         {
             yield return null;
         }
-
-        //// 유닛 등장 연출 (선택적으로 추가 가능)
-        //Unit playerUnit = UnitManager.Instance.GetUnitsByType(101).Find(x => true);
-        //if (playerUnit != null)
-        //{
-        //    yield return StartCoroutine(playerUnit.MoveTo(GridManager.Instance.GetTile()));
-        //}
     }
 
     private void Update()
