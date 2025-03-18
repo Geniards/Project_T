@@ -177,6 +177,7 @@ public class InputManager : MonoBehaviour
         }
         Vector2 screenPos = Mouse.current.position.ReadValue();
         Vector3 worldPos = cam.ScreenToWorldPoint(new Vector3(screenPos.x, screenPos.y, cam.transform.position.z));
+        SoundManager.Instance.PlaySFX(SoundManager.Instance.buttomSFX);
 
         GameManager.Instance.HandleClick(worldPos);
     }
@@ -204,6 +205,7 @@ public class InputManager : MonoBehaviour
         {
             GameManager.Instance.UndoMove();
         }
+        SoundManager.Instance.PlaySFX(SoundManager.Instance.canselSFX);
     }
 
     private void ZoomCamera(InputAction.CallbackContext context)

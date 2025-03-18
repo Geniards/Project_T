@@ -138,6 +138,7 @@ public class Unit : MonoBehaviour
                 elapsedTime += Time.deltaTime;
                 yield return null;
             }
+            SoundManager.Instance.PlaySFX(SoundManager.Instance.moveSFX);
 
             transform.position = endPos;
             currentTile = tile;
@@ -175,9 +176,7 @@ public class Unit : MonoBehaviour
     {
         foreach (Tile tile in path)
         {
-            // 타일 이동(한칸씩 이동)
-            //transform.position = tile.transform.position;
-            //yield return new WaitForSeconds(0.2f);
+            SoundManager.Instance.PlaySFX(SoundManager.Instance.moveSFX);
 
             // 이동 방향 계산
             Vector2Int direction = tile.vec2IntPos - currentTile.vec2IntPos;
@@ -330,6 +329,7 @@ public class Unit : MonoBehaviour
         if (unitState == E_UnitState.Complete) yield break;
 
         // 공격애니메이션 실행
+        SoundManager.Instance.PlaySFX(SoundManager.Instance.attackSFX);
         Vector2Int direction = target.currentTile.vec2IntPos - currentTile.vec2IntPos;
         unitAnimator.PlayAttackAnimation(direction);
 
@@ -357,6 +357,7 @@ public class Unit : MonoBehaviour
     {
         // 피격 애니메이션 실행
         unitAnimator.PlayHitAnimation();
+        SoundManager.Instance.PlaySFX(SoundManager.Instance.hitSFX);
         unitData.hP -= damage;
         UIManager.Instance.CheckHp(this);
 #if UNITY_EDITOR

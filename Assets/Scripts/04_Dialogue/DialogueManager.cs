@@ -114,15 +114,25 @@ public class DialogueManager : MonoBehaviour
             isDialogueActive = false;
             dialogueUI.HideDialogueBox();
             InputManager.Instance.DisableDialogueActive();
-            UIManager.Instance.ShowActionMenu();
+
+            if(UIManager.Instance.selectedUnit)
+                UIManager.Instance.ShowActionMenu();
             return;
         }
         // 다음 대사를 꺼냄
         DialogueEntry entry = dialogueQueue.Dequeue();
-        // 1) 대사 표시
-        dialogueUI.UpdateDialogue(entry.name, entry.portrait, entry.BG, entry.text);
 
-        // 2) 만약 유닛 애니메이션 정보를 가지고 있으면 실행
+        // 0) 대화 중 BGM 변경 (필드가 있으면 변경)
+        if (!string.IsNullOrEmpty(entry.bgmChange))
+        {
+            AudioClip newBGM = Resources.Load<AudioClip>($"Audio/{entry.bgmChange}");
+            if (newBGM != null)
+            {
+                SoundManager.Instance.PlayBGM(newBGM);
+            }
+        }
+
+        // 1) 만약 유닛 애니메이션 정보를 가지고 있으면 실행
         if (entry.unitId != 0)
         {
             Debug.Log("대화 중 유닛 이동");
@@ -136,6 +146,9 @@ public class DialogueManager : MonoBehaviour
                 StartCoroutine(PlayStoryAnimation(targetUnit, entry.animationType, entry.repeatCount, entry.targetX, entry.targetY));
             }
         }
+
+        // 2) 대사 표시
+        dialogueUI.UpdateDialogue(entry.name, entry.portrait, entry.BG, entry.text);
     }
 
     private IEnumerator PlayStoryAnimation(Unit unit, string animType, int repeatCount, int targetX, int targetY)

@@ -54,10 +54,6 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button mainMenuButton;
     [SerializeField] private TMP_Text ResultText;
 
-    [Header("볼륨 슬라이더")]
-    [SerializeField] private Slider bgmSlider;
-    [SerializeField] private Slider sfxSlider;
-
     // 마지막으로 상태 UI를 표시한 유닛
     private Unit lastHoveredUnit;
 
