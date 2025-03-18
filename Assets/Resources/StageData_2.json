@@ -33,16 +33,17 @@
     "MMMMMMMMMMMMMGGGGPPP",
     "MMMMMMMMMMMMMMMGGGGG"
   ],
-  "imagePath" :  "Stage/Stage02",
+  "imagePath": "Stage/Stage02",
+  "bgmFileName": "Stage_theme_1",
   "units": [
-    { "unitTypeId": 1, "startX": 0, "startY": 9, "unitTeam": "Ally" },
-    { "unitTypeId": 2, "startX": 0, "startY": 10, "unitTeam": "Ally" },
-    { "unitTypeId": 3, "startX": 2, "startY": 9, "unitTeam": "Ally" },
-    { "unitTypeId": 4, "startX": 2, "startY": 10, "unitTeam": "Ally" },
-    { "unitTypeId": 101, "startX": 17, "startY": 10, "unitTeam": "Enemy" },
-    { "unitTypeId": 101, "startX": 17, "startY": 11, "unitTeam": "Enemy" },
-    { "unitTypeId": 102, "startX": 17, "startY": 12, "unitTeam": "Enemy" },
-    { "unitTypeId": 102, "startX": 17, "startY": 13, "unitTeam": "Enemy" },
-    { "unitTypeId": 102, "startX": 17, "startY": 14, "unitTeam": "Enemy" }
+    { "unitTypeId": 1, "startX": 0, "startY": 9, "unitTeam": 1 },
+    { "unitTypeId": 2, "startX": 0, "startY": 10, "unitTeam": 1 },
+    { "unitTypeId": 3, "startX": 2, "startY": 9, "unitTeam": 1 },
+    { "unitTypeId": 4, "startX": 2, "startY": 10, "unitTeam": 1 },
+    { "unitTypeId": 101, "startX": 17, "startY": 10, "unitTeam": 2 },
+    { "unitTypeId": 101, "startX": 17, "startY": 11, "unitTeam": 2 },
+    { "unitTypeId": 102, "startX": 17, "startY": 12, "unitTeam": 2 },
+    { "unitTypeId": 102, "startX": 17, "startY": 13, "unitTeam": 2 },
+    { "unitTypeId": 102, "startX": 17, "startY": 14, "unitTeam": 2 }
   ]
 }
