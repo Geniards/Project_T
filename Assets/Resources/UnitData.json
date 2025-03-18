@@ -10,9 +10,9 @@
       "level": 3,
       "exp": 0,
       "maxExp": 300,
-      "attackPower": 400,
+      "attackPower": 40,
       "unitTypeNum": 1,
-      "attackRange": 15,
+      "attackRange": 1,
       "moveRange": 3
     },
     {
@@ -25,9 +25,9 @@
       "level": 3,
       "exp": 0,
       "maxExp": 200,
-      "attackPower": 500,
+      "attackPower": 50,
       "unitTypeNum": 2,
-      "attackRange": 15,
+      "attackRange": 1,
       "moveRange": 3
     },
     {

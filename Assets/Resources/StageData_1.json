@@ -39,6 +39,9 @@
     { "unitTypeId": 3, "startX": 7, "startY": 3, "unitTeam": 1 },
     { "unitTypeId": 4, "startX": 1, "startY": 3, "unitTeam": 1 },
     { "unitTypeId": 101, "startX": 7, "startY": 8, "unitTeam": 2 },
-    { "unitTypeId": 102, "startX": 9, "startY": 10, "unitTeam": 2 }
+    { "unitTypeId": 101, "startX": 9, "startY": 8, "unitTeam": 2 },
+    { "unitTypeId": 101, "startX": 7, "startY": 12, "unitTeam": 2 },
+    { "unitTypeId": 102, "startX": 9, "startY": 10, "unitTeam": 2 },
+    { "unitTypeId": 102, "startX": 7, "startY": 10, "unitTeam": 2 }
   ]
 }
