@@ -172,4 +172,19 @@ public class TurnManager : MonoBehaviour
         turnCount = 1;
         isPlayerTurn = true;
     }
+
+    public bool IsPlayerTurn()
+    {
+        return isPlayerTurn;
+    }
+
+    public void SetTurnCount(int count)
+    {
+        turnCount = count;
+    }
+
+    public void SetPlayerTurn(bool isTurn)
+    {
+        isPlayerTurn = isTurn;
+    }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class UnitManager : MonoBehaviour
@@ -230,5 +231,33 @@ public class UnitManager : MonoBehaviour
             }
         }
         return nearestUnit;
+    }
+
+    /// <summary>
+    /// 특정 unitId를 가진 유닛 반환
+    /// 동일한 ID가 여러 개 있을 경우, 가장 가까운 유닛을 반환.
+    /// </summary>
+    /// <param name="unitId"></param>
+    /// <param name="team"></param>
+    /// <param name="position"></param>
+    /// <returns></returns>
+    public Unit GetUnitById(int unitId, E_UnitTeam team, Vector2Int position)
+    {
+        // 특정 팀에서 unitId를 가진 유닛 리스트 가져오기
+        List<Unit> unitList = GetUnitsByType(unitId).Where(u => u.unitData.unitTeam == team).ToList();
+
+        // 찾는 유닛이 없음
+        if (unitList.Count == 0)
+        {
+            return null;
+        }
+        // 하나뿐이라면 바로 반환
+        else if (unitList.Count == 1)
+        {
+            return unitList[0];
+        }
+
+        // 같은 ID를 가진 유닛이 여러 개 있을 경우, 가장 가까운 유닛 반환
+        return unitList.OrderBy(u => Vector2Int.Distance(position, u.currentTile.vec2IntPos)).First();
     }
 }

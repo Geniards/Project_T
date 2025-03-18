@@ -464,4 +464,9 @@ public class GameManager : MonoBehaviour
         // 대화 종료 후 게임 목표 UI 표시
         UIManager.Instance.ShowGameObjectives();
     }
+
+    public int GetCurrentStage()
+    {
+        return currentStageIndex;
+    }
 }
