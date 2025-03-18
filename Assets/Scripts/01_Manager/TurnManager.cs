@@ -56,6 +56,11 @@ public class TurnManager : MonoBehaviour
         {
             StartCoroutine(EnemyTurnRoutine());
         }
+
+        foreach (Unit unit in UnitManager.Instance.GetAllUnits())
+        {
+            unit.ResetTurn();
+        }
     }
 
     /// <summary>
@@ -86,6 +91,7 @@ public class TurnManager : MonoBehaviour
             }
         }
 
+        Debug.Log($"{playerUnits.Count}");
         Debug.Log("아군 턴 종료!");
         EndTurn();
     }
@@ -186,5 +192,6 @@ public class TurnManager : MonoBehaviour
     public void SetPlayerTurn(bool isTurn)
     {
         isPlayerTurn = isTurn;
+        playerUnits = UnitManager.Instance.GetPlayerUnits();
     }
 }

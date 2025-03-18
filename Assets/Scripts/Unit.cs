@@ -22,10 +22,13 @@ public class Unit : MonoBehaviour
     // 애니메이션 컨트롤러
     private UnitAnimator unitAnimator;
 
+    // 유닛의 색상 변경을 위한 렌더러
+    private SpriteRenderer spriteRenderer;
+
     private void Awake()
     {
-        // 애니메이션 관리 클래스 가져오기
         unitAnimator = GetComponent<UnitAnimator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
 
@@ -68,6 +71,24 @@ public class Unit : MonoBehaviour
     }
 
     /// <summary>
+    /// 유닛 상태 변경 시 색상 업데이트
+    /// </summary>
+    public void UpdateUnitAppearance()
+    {
+        if (unitState == E_UnitState.Complete)
+        {
+            // 행동 완료된 유닛
+            spriteRenderer.color = new Color(0.6f, 0.6f, 0.6f, 1f);
+        }
+        else
+        {
+            // 행동 가능한 유닛
+            spriteRenderer.color = Color.white;
+        }
+    }
+
+
+    /// <summary>
     /// 유닛 선택
     /// </summary>
     public void Select()
@@ -93,6 +114,24 @@ public class Unit : MonoBehaviour
         currentTile.ClearHighlight();
         GridManager.Instance.ClearWalkableTiles();
         GridManager.Instance.GetTile(this.previousPosition).ClearHighlight();
+    }
+
+    /// <summary>
+    /// 유닛이 행동을 완료했을 때 호출
+    /// </summary>
+    public void CompleteAction()
+    {
+        unitState = E_UnitState.Complete;
+        UpdateUnitAppearance();
+    }
+
+    /// <summary>
+    /// 턴이 시작될 때 유닛 상태 초기화
+    /// </summary>
+    public void ResetTurn()
+    {
+        unitState = E_UnitState.Idle;
+        UpdateUnitAppearance();
     }
 
     /// <summary>

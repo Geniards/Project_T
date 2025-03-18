@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -34,8 +35,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject turnUI;  // 턴 UI
     [SerializeField] private TMP_Text turnText;  // 턴 텍스트
 
-    [Header("UI Canvas")]
-    [SerializeField] private CanvasGroup canvasGroup;
+    [Header("Canvas 설정")]
+    [SerializeField] private CanvasGroup actionMenuCanvasGroup;
 
     [Header("UI 위치")]
     [SerializeField] private Vector3 uiPos;
@@ -53,6 +54,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button retryButton;
     [SerializeField] private Button mainMenuButton;
     [SerializeField] private TMP_Text ResultText;
+
+    [Header("저장 UI")]
+    [SerializeField] private GameObject panel;
 
     // 마지막으로 상태 UI를 표시한 유닛
     private Unit lastHoveredUnit;
@@ -106,18 +110,39 @@ public class UIManager : MonoBehaviour
         actionMenu.SetActive(true);
         isActionMenuVisible = true;
 
-        // 메뉴 활성화 시 UI 뒤쪽 터치 방지
-        canvasGroup.blocksRaycasts = true;
-        canvasGroup.interactable = true;
-        
-        uiPos = selectedUnit.transform.position + new Vector3(1f, 0, -1f);
-        actionMenu.transform.position = uiPos;
+        // UI 뒤쪽 캐릭터 클릭 방지
+        actionMenuCanvasGroup.blocksRaycasts = true;
+        actionMenuCanvasGroup.interactable = true;
+
+        AdjustUIPosition(selectedUnit);
+
+        //uiPos = selectedUnit.transform.position + new Vector3(1f, 0, -1f);
+        //actionMenu.transform.position = uiPos;
     
         // 선택된 유닛을 마지막에 호버된 유닛으과 같다면 StatusUI를 false로
         if (lastHoveredUnit == selectedUnit)
         {
             unitStatusUI.SetActive(false);
         }
+    }
+
+    /// <summary>
+    /// 액션 UI 및 상태 UI 위치 자동 조정
+    /// </summary>
+    private void AdjustUIPosition(Unit selectedUnit)
+    {
+        Vector3 preferredPosition = selectedUnit.transform.position + new Vector3(1f, 0, -1f);
+
+        // 오른쪽에 다른 유닛이 있는지 확인
+        Vector2Int rightPosition = selectedUnit.currentTile.vec2IntPos + Vector2Int.right;
+        Unit rightUnit = UnitManager.Instance.GetUnitAtPosition(rightPosition);
+
+        if (rightUnit != null) // 만약 오른쪽에 유닛이 있다면 UI를 왼쪽으로 배치
+        {
+            preferredPosition = selectedUnit.transform.position + new Vector3(-1f, 0, -1f);
+        }
+
+        actionMenu.transform.position = preferredPosition;
     }
 
     /// <summary>
@@ -128,9 +153,9 @@ public class UIManager : MonoBehaviour
         actionMenu.SetActive(false);
         isActionMenuVisible = false;
 
-        // 메뉴 숨김 시 UI 뒤쪽 터치 허용
-        canvasGroup.blocksRaycasts = false;
-        canvasGroup.interactable = false;
+        // UI 숨길 때 다시 클릭 가능하도록 설정
+        actionMenuCanvasGroup.blocksRaycasts = false;
+        actionMenuCanvasGroup.interactable = false;
     }
 
     public void AfterShowActionMenu()
@@ -157,7 +182,7 @@ public class UIManager : MonoBehaviour
 
     private void OnWaitButtonClick()
     {
-        selectedUnit.unitState = E_UnitState.Complete;
+        selectedUnit.CompleteAction();
         HideActionMenu();
         selectedUnit = null;
         GameManager.Instance.selectedUnit = selectedUnit;
@@ -377,5 +402,16 @@ public class UIManager : MonoBehaviour
         HideGameObjectives();
         HideVictoryUI();
         HideDefeatUI();
+    }
+
+    /// <summary>
+    /// 버튼을 누를 때 패널을 토글
+    /// </summary>
+    public void TogglePanel()
+    {
+        if (panel != null)
+        {
+            panel.SetActive(!panel.activeSelf);
+        }
     }
 }
