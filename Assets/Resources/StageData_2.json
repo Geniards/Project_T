@@ -1,34 +1,49 @@
 {
   "stageId": 2,
   "stageName": "관도대전",
-  "width": 15,
-  "height": 15,
-  "tileLegend": {
-    "G": { "type": "Grass", "walkable": true },
-    "R": { "type": "Road", "walkable": true },
-    "W": { "type": "Water", "walkable": false },
-    "M": { "type": "Mountain", "walkable": false }
-  },
-  "tileMap": [
-    "GGGGGGGGGGGGGGG",
-    "GRRRRRRRRRGGGGG",
-    "GWWWWWWWWRGGGGG",
-    "GRRRRRRRRRGGGGG",
-    "GGGGGGGGGGGGGGG",
-    "GGGGGRRRRGGGGGG",
-    "GGGGGRRRRGGGGGG",
-    "GGGGGGGGGGGGGGG",
-    "GGGGMGGGGGGGGGG",
-    "GGGGMGGGGGGGGGG",
-    "GGGGGGGGGGGGGGG",
-    "GRRRRRRRRRGGGGG",
-    "GWWWWWWWWRGGGGG",
-    "GRRRRRRRRRGGGGG",
-    "GGGGGGGGGGGGGGG"
+  "width": 20,
+  "height": 20,
+  "tileLegendList": [
+    { "key": "G", "value": { "type": "Grass", "walkable": true } },
+    { "key": "R", "value": { "type": "Road", "walkable": true } },
+    { "key": "P", "value": { "type": "Plane", "walkable": true } },
+    { "key": "W", "value": { "type": "Water", "walkable": false } },
+    { "key": "M", "value": { "type": "Mountain", "walkable": false } },
+    { "key": "O", "value": { "type": "Obstacle", "walkable": false } }
   ],
+  "tileMap": [
+    "MMMMMMMMMMMMMMMMGGPP",
+    "MMMMMMMMMMMMMMGGGGPP",
+    "MMMMMMMMMMMMMGGGPPPP",
+    "MMMMMMMMGGGGGGGGPPPP",
+    "MORROGGGGGGGGGGPPPPP",
+    "PORROPPGGGGGGGPPPPPP",
+    "PORROPPGGGGGGPPPPPPP",
+    "PORROPPPPPPPPPPPPPPP",
+    "PORROPPPPPPPPPPPPPPR",
+    "RRRRRRRRRRRRRRRRRRRR",
+    "RRRRRRRRRRRRRRRRRRRR",
+    "PORROPPPPPPPPPPPPPPP",
+    "PORROPPPPPPPPPPPPPPP",
+    "PORROPPPGGGGPPPPPPPP",
+    "MORROGGGGGGGPPPPPPPP",
+    "MMMMMMMMGGGGGPPPPPPP",
+    "MMMMMMMMMGGGGGPPPPPP",
+    "MMMMMMMMMMGGGGGGPPPP",
+    "MMMMMMMMMMMMMGGGGPPP",
+    "MMMMMMMMMMMMMMMGGGGG"
+  ],
+  "imagePath": "Stage/Stage02",
+  "bgmFileName": "Stage_theme_1",
   "units": [
-    { "unitTypeId": 1, "startX": 3, "startY": 3, "unitTeam": "Ally" },
-    { "unitTypeId": 2, "startX": 7, "startY": 8, "unitTeam": "Enemy" },
-    { "unitTypeId": 3, "startX": 9, "startY": 10, "unitTeam": "Enemy" }
+    { "unitTypeId": 1, "startX": 0, "startY": 9, "unitTeam": 1 },
+    { "unitTypeId": 2, "startX": 0, "startY": 10, "unitTeam": 1 },
+    { "unitTypeId": 3, "startX": 2, "startY": 9, "unitTeam": 1 },
+    { "unitTypeId": 4, "startX": 2, "startY": 10, "unitTeam": 1 },
+    { "unitTypeId": 101, "startX": 17, "startY": 10, "unitTeam": 2 },
+    { "unitTypeId": 101, "startX": 17, "startY": 11, "unitTeam": 2 },
+    { "unitTypeId": 102, "startX": 17, "startY": 12, "unitTeam": 2 },
+    { "unitTypeId": 102, "startX": 17, "startY": 13, "unitTeam": 2 },
+    { "unitTypeId": 102, "startX": 17, "startY": 14, "unitTeam": 2 }
   ]
 }

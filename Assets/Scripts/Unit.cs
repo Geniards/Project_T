@@ -7,6 +7,8 @@ using static UnityEngine.UI.CanvasScaler;
 
 public class Unit : MonoBehaviour
 {
+    public event Action OnMoveComplete; // 이동 완료 이벤트
+
     // 유닛 기본 정보
     public UnitData unitData; // 유닛 기본 정보
     public Tile currentTile; // 유닛이 현재 위치한 타일 위치
@@ -20,10 +22,13 @@ public class Unit : MonoBehaviour
     // 애니메이션 컨트롤러
     private UnitAnimator unitAnimator;
 
+    // 유닛의 색상 변경을 위한 렌더러
+    private SpriteRenderer spriteRenderer;
+
     private void Awake()
     {
-        // 애니메이션 관리 클래스 가져오기
         unitAnimator = GetComponent<UnitAnimator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
 
@@ -66,6 +71,24 @@ public class Unit : MonoBehaviour
     }
 
     /// <summary>
+    /// 유닛 상태 변경 시 색상 업데이트
+    /// </summary>
+    public void UpdateUnitAppearance()
+    {
+        if (unitState == E_UnitState.Complete)
+        {
+            // 행동 완료된 유닛
+            spriteRenderer.color = new Color(0.6f, 0.6f, 0.6f, 1f);
+        }
+        else
+        {
+            // 행동 가능한 유닛
+            spriteRenderer.color = Color.white;
+        }
+    }
+
+
+    /// <summary>
     /// 유닛 선택
     /// </summary>
     public void Select()
@@ -90,9 +113,25 @@ public class Unit : MonoBehaviour
         isSelected = false;
         currentTile.ClearHighlight();
         GridManager.Instance.ClearWalkableTiles();
-        //GridManager.Instance.ClearAttackableTiles();
+        GridManager.Instance.GetTile(this.previousPosition).ClearHighlight();
+    }
 
-        //animation - mov01
+    /// <summary>
+    /// 유닛이 행동을 완료했을 때 호출
+    /// </summary>
+    public void CompleteAction()
+    {
+        unitState = E_UnitState.Complete;
+        UpdateUnitAppearance();
+    }
+
+    /// <summary>
+    /// 턴이 시작될 때 유닛 상태 초기화
+    /// </summary>
+    public void ResetTurn()
+    {
+        unitState = E_UnitState.Idle;
+        UpdateUnitAppearance();
     }
 
     /// <summary>
@@ -111,6 +150,44 @@ public class Unit : MonoBehaviour
         {
             StartCoroutine(MoveAlongPath(path));
         }
+    }
+
+    public IEnumerator MoveToCoroutine(Tile targetTile)
+    {
+        if (targetTile == null) yield break;
+
+        List<Tile> path = GridManager.Instance.FindPathAStar(currentTile, targetTile);
+
+        // 경로의 각 타일로 한 칸씩 이동
+        foreach (Tile tile in path)
+        {
+            // 이동 방향 계산
+            Vector2Int direction = tile.vec2IntPos - currentTile.vec2IntPos;
+            unitAnimator.PlayMoveAnimation(direction); // 방향에 맞는 이동 애니메이션 실행
+
+            // 타일 이동(부드럽게 이동)
+            Vector3 startPos = transform.position;
+            Vector3 endPos = tile.transform.position;
+            float elapsedTime = 0f;
+            float moveDuration = 0.3f; // 이동 속도 조절
+
+            while (elapsedTime < moveDuration)
+            {
+                transform.position = Vector3.Lerp(startPos, endPos, (elapsedTime / moveDuration));
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+            SoundManager.Instance.PlaySFX(SoundManager.Instance.moveSFX);
+
+            transform.position = endPos;
+            currentTile = tile;
+            currentTile.isOccupied = false;
+
+            // 한 칸 이동 후 멈춤 효과
+            yield return new WaitForSeconds(0.2f);
+        }
+
+        GridManager.Instance.GetTile(this.previousPosition).ClearHighlight();
     }
 
     /// <summary>
@@ -138,9 +215,7 @@ public class Unit : MonoBehaviour
     {
         foreach (Tile tile in path)
         {
-            // 타일 이동(한칸씩 이동)
-            //transform.position = tile.transform.position;
-            //yield return new WaitForSeconds(0.2f);
+            SoundManager.Instance.PlaySFX(SoundManager.Instance.moveSFX);
 
             // 이동 방향 계산
             Vector2Int direction = tile.vec2IntPos - currentTile.vec2IntPos;
@@ -177,8 +252,13 @@ public class Unit : MonoBehaviour
 
         CheckIdleState();
         // 이동완료 후 메뉴 UI 갱신
-        if(unitData.unitTeam == E_UnitTeam.Ally)
-            UIManager.Instance.ShowActionMenu(this);
+        if (unitData.unitTeam == E_UnitTeam.Ally)
+        {
+            UIManager.Instance.selectedUnit = this;
+            UIManager.Instance.ShowActionMenu();
+        }
+        // 이동 완료 후 이벤트 실행
+        OnMoveComplete?.Invoke();
 
         Deselect();
     }
@@ -288,6 +368,7 @@ public class Unit : MonoBehaviour
         if (unitState == E_UnitState.Complete) yield break;
 
         // 공격애니메이션 실행
+        SoundManager.Instance.PlaySFX(SoundManager.Instance.attackSFX);
         Vector2Int direction = target.currentTile.vec2IntPos - currentTile.vec2IntPos;
         unitAnimator.PlayAttackAnimation(direction);
 
@@ -300,7 +381,10 @@ public class Unit : MonoBehaviour
 
         // UI 선택창 다시 On
         if (unitData.unitTeam == E_UnitTeam.Ally)
-            UIManager.Instance.ShowActionMenu(this);
+        {
+            UIManager.Instance.selectedUnit = this;
+            UIManager.Instance.ShowActionMenu();
+        }
         Deselect();
     }
 
@@ -312,6 +396,7 @@ public class Unit : MonoBehaviour
     {
         // 피격 애니메이션 실행
         unitAnimator.PlayHitAnimation();
+        SoundManager.Instance.PlaySFX(SoundManager.Instance.hitSFX);
         unitData.hP -= damage;
         UIManager.Instance.CheckHp(this);
 #if UNITY_EDITOR
@@ -335,6 +420,9 @@ public class Unit : MonoBehaviour
         Debug.Log($"{unitData.unitId} 사망!");
         currentTile.isOccupied = false;
         UnitManager.Instance.RemoveUnit(this);
+
+        // 즉시 게임 상태 확인 (승리/패배 판정)
+        GameManager.Instance.CheckGameState();
     }
 
     /// <summary>

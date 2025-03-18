@@ -5,6 +5,7 @@ public enum E_UnitType
 {
     None,
     Emperor,
+    General,
     Soldier,
     Archor,
     HorseSoldier,

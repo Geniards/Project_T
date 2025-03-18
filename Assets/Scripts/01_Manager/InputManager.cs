@@ -5,6 +5,8 @@ using UnityEngine.InputSystem;
 
 public class InputManager : MonoBehaviour
 {
+    public static InputManager Instance { get; private set; }
+
     private PlayerInput playerInput;    // PlayerInput 사용
     private PlayerInputActions inputActions;
     private Transform cameraTransform;
@@ -37,7 +39,10 @@ public class InputManager : MonoBehaviour
     [Header("Screen Edge Motion")]
     [Range(0f, 0.1f)]
     [SerializeField] private float edgeTolerance = 0.05f;
-    
+
+    [Header("대화 중 입력 차단 플래그")]
+    [SerializeField] private bool isDialogueActive = false;
+
     private Vector3 targetPos;
     private float zoomHeight;
 
@@ -49,15 +54,11 @@ public class InputManager : MonoBehaviour
 
     private void Awake()
     {
-        //// 마우스 선택
-        //playerInput = GetComponent<PlayerInput>();              // PlayerInput 컴포넌트 가져오기
-        //selectAction = playerInput.actions["Select"];           // Select 액션 가져오기
-        //moveAction = playerInput.actions["Move"];               // Move 액션 가져오기
-        //rightClickAction = playerInput.actions["RightClick"];   // RightClick 액션 가져오기
+        if (!Instance)
+            Instance = this;
+        else
+            Destroy(gameObject);
 
-        //selectAction.performed += OnSelectPerformed;    // 액션 수행시 호출할 함수 등록
-        //moveAction.performed += OnMouseMove;
-        //rightClickAction.performed += HandleRightClick;
 
         // 마우스 이동 초기화
         inputActions = new PlayerInputActions();
@@ -74,8 +75,6 @@ public class InputManager : MonoBehaviour
         zoomAction.performed += ZoomCamera;
         inputActions.Click.Enable();
 
-
-
         // 유닛 선택 및 Undo
         selectAction = inputActions.Click.Select;
         selectAction.performed += OnSelectPerformed;
@@ -88,9 +87,6 @@ public class InputManager : MonoBehaviour
         rightClickAction = inputActions.Click.RightClick;
         rightClickAction.performed += HandleRightClick;
         rightClickAction.Enable();
-        
-
-
     }
 
     private void OnDisable()
@@ -102,11 +98,11 @@ public class InputManager : MonoBehaviour
     {
         // 키보드 입력
         GetKeyboardMovenet();
-        CheckMouseAtScreenEdge();
+        //CheckMouseAtScreenEdge();
 
         // 속도 업데이트 및 위치 업데이트
         UpdateVelocity();
-        UpdateCameraPos();
+        //UpdateCameraPos();
         UpdateBasePosition();
     }
 
@@ -173,8 +169,15 @@ public class InputManager : MonoBehaviour
     /// <param name="context"></param>
     private void OnSelectPerformed(InputAction.CallbackContext context)
     {
+        // 대화창이 활성화시 동작 X
+        if (isDialogueActive)
+        {
+            DialogueManager.Instance.ShowNextDialogue();
+            return;
+        }
         Vector2 screenPos = Mouse.current.position.ReadValue();
         Vector3 worldPos = cam.ScreenToWorldPoint(new Vector3(screenPos.x, screenPos.y, cam.transform.position.z));
+        SoundManager.Instance.PlaySFX(SoundManager.Instance.buttomSFX);
 
         GameManager.Instance.HandleClick(worldPos);
     }
@@ -192,6 +195,8 @@ public class InputManager : MonoBehaviour
 
     private void HandleRightClick(InputAction.CallbackContext context)
     {
+        if (isDialogueActive) return;
+
         if (UIManager.Instance.IsAttackMode())
         {
             UIManager.Instance.CancelAttackMode();
@@ -200,13 +205,16 @@ public class InputManager : MonoBehaviour
         {
             GameManager.Instance.UndoMove();
         }
+        SoundManager.Instance.PlaySFX(SoundManager.Instance.canselSFX);
     }
 
     private void ZoomCamera(InputAction.CallbackContext context)
     {
-        float zoomInput = -context.ReadValue<Vector2>().y / 100f;
+        if (isDialogueActive) return;
 
-        if(Mathf.Abs(zoomInput) > 0.1f)
+        float zoomInput = -context.ReadValue<Vector2>().y / 1000f;
+
+        if(Mathf.Abs(zoomInput) > 0.01f)
         {
             float newSize = cam.orthographicSize + zoomInput * stepSize;
             cam.orthographicSize = Mathf.Clamp(newSize, minHeight, maxHeight);
@@ -224,6 +232,8 @@ public class InputManager : MonoBehaviour
 
     private void CheckMouseAtScreenEdge()
     {
+        if (isDialogueActive) return;
+
         Vector2 mousePos = Mouse.current.position.ReadValue();
         Vector3 moveDirect = Vector3.zero;
 
@@ -238,5 +248,15 @@ public class InputManager : MonoBehaviour
             moveDirect += GetCameraUp();
 
         targetPos += moveDirect;
+    }
+
+    public void EnableDialogueActive()
+    {
+        isDialogueActive = true;
+    }
+
+    public void DisableDialogueActive()
+    {
+        isDialogueActive = false;
     }
 }

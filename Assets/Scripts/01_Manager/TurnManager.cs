@@ -12,6 +12,7 @@ public class TurnManager : MonoBehaviour
     private Queue<Unit> enemyUnits = new Queue<Unit>();
 
     private bool isPlayerTurn = true;
+    private int turnCount = 1;
 
     private void Awake()
     {
@@ -38,16 +39,27 @@ public class TurnManager : MonoBehaviour
     /// </summary>
     public void StartTurn()
     {
+        StartCoroutine(StartTurnSequence());
+    }
+
+    private IEnumerator StartTurnSequence()
+    {
+        // 턴 UI 표시
+        yield return UIManager.Instance.ShowTurnUI(isPlayerTurn, turnCount);
+
         GridManager.Instance.ClearAttackableTiles();
         if (isPlayerTurn)
         {
-            Debug.Log("아군 턴 시작!");
             StartPlayerTurn();
         }
         else
         {
-            Debug.Log("적군 턴 시작!");
             StartCoroutine(EnemyTurnRoutine());
+        }
+
+        foreach (Unit unit in UnitManager.Instance.GetAllUnits())
+        {
+            unit.ResetTurn();
         }
     }
 
@@ -79,6 +91,7 @@ public class TurnManager : MonoBehaviour
             }
         }
 
+        Debug.Log($"{playerUnits.Count}");
         Debug.Log("아군 턴 종료!");
         EndTurn();
     }
@@ -110,6 +123,14 @@ public class TurnManager : MonoBehaviour
     {
         // 턴 변경
         isPlayerTurn = !isPlayerTurn;
+        if (isPlayerTurn)
+        {
+            turnCount++;
+        }
+
+        // 승리/ 패배 체크
+        GameManager.Instance.CheckGameState();
+
         StartTurn();
     }
 
@@ -122,5 +143,55 @@ public class TurnManager : MonoBehaviour
         {
             EndTurn();
         }
+    }
+
+    public int GetTurnCount()
+    {
+        return turnCount;
+    }
+
+
+    /// <summary>
+    /// 적군 행동 순서를 랜덤하게 변경
+    /// </summary>
+    /// <param name="enemyQueue"></param>
+    private void ShuffleEnemyQueue(Queue<Unit> enemyQueue)
+    {
+        List<Unit> enemyList = new List<Unit>(enemyQueue);
+
+        // Fisher-Yates Shuffle
+        for (int i = enemyList.Count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            (enemyList[i], enemyList[j]) = (enemyList[j], enemyList[i]); // Swap
+        }
+
+        enemyQueue.Clear();
+        foreach (Unit unit in enemyList)
+        {
+            enemyQueue.Enqueue(unit);
+        }
+    }
+
+    public void ResetTurn()
+    {
+        turnCount = 1;
+        isPlayerTurn = true;
+    }
+
+    public bool IsPlayerTurn()
+    {
+        return isPlayerTurn;
+    }
+
+    public void SetTurnCount(int count)
+    {
+        turnCount = count;
+    }
+
+    public void SetPlayerTurn(bool isTurn)
+    {
+        isPlayerTurn = isTurn;
+        playerUnits = UnitManager.Instance.GetPlayerUnits();
     }
 }

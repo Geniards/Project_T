@@ -1,11 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
 
 public class GridManager : MonoBehaviour
 {
@@ -85,8 +82,8 @@ public class GridManager : MonoBehaviour
                     tile.SetTilePosition(position);
                     tile.SetTileProperties(tileInfo.walkable, Enum.Parse<E_TileType>(tileInfo.type));
 
-                    if (!tile.isWalkable)
-                        tile.defaultColor = new Color(0, 0, 1f);
+                    //if (!tile.isWalkable)
+                    //    tile.defaultColor = new Color(0, 0, 1f);
 
                     tileDictionary[position] = tile;
                 }
@@ -204,6 +201,7 @@ public class GridManager : MonoBehaviour
     {
         foreach (var tile in walkableTiles)
         {
+            if (!attackableTiles.Contains(tile))
             tile.ClearHighlight();
         }
         walkableTiles.Clear();
@@ -265,7 +263,15 @@ public class GridManager : MonoBehaviour
                 if (!tileDictionary.ContainsKey(neighborPos)) continue;
 
                 Tile neighborTile = tileDictionary[neighborPos];
-                if (closedSet.Contains(neighborTile) || !neighborTile.isWalkable || neighborTile.isOccupied) continue;
+
+                // 벽(장애물) 통과 불가
+                if (!neighborTile.isWalkable) continue;
+
+                // 경유지는 유닛이 있어도 이동 가능, 최종 도착지는 유닛이 있으면 이동 불가
+                bool isFinalDestination = (neighborTile == targetTile);
+                if (isFinalDestination && neighborTile.isOccupied) continue;
+
+                if (closedSet.Contains(neighborTile)) continue;
 
                 // 10. 이동 가능한 타일의 gScore를 계산하고, 이전 gScore보다 작으면 갱신
                 int tentativeGScore = gScore[currentTile] + 1;

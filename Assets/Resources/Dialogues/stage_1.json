@@ -1,0 +1,38 @@
+{
+  "dialogues": [
+    {
+      "name": "조조",
+      "portrait": "Jojo",
+      "BG": "",
+      "text": "적군을 유인해서 처리하도록 하자!",
+      "unitId": 1,
+      "animationType": "Move",
+      "repeatCount": 1,
+      "targetX": 7,
+      "targetY": 4
+    },
+    {
+      "name": "조조",
+      "portrait": "Jojo",
+      "BG": "",
+      "text": "하후돈 준비 되었는가?"
+    },
+    {
+      "name": "하후돈",
+      "portrait": "Hahudon",
+      "BG": "",
+      "text": "네!! 준비 완료 되었습니다.",
+      "unitId": 2,
+      "animationType": "Move",
+      "repeatCount": 1,
+      "targetX": 10,
+      "targetY": 4
+    },
+    {
+      "name": "하후돈",
+      "portrait": "Hahudon",
+      "BG": "",
+      "text": "이놈들 내가 간다!!"
+    }
+  ]
+}

@@ -31,10 +31,17 @@
     "GGGGGGGGRRRRRRRRGGGG",
     "GGGGGGGGGRRRRRGGGGGG"
   ],
-  "imagePath" :  "Stage/Stage01",
+  "imagePath": "Stage/Stage01",
+  "bgmFileName": "Stage_theme_1",
   "units": [
     { "unitTypeId": 1, "startX": 3, "startY": 3, "unitTeam": 1 },
-    { "unitTypeId": 2, "startX": 7, "startY": 8, "unitTeam": 2 },
-    { "unitTypeId": 2, "startX": 9, "startY": 10, "unitTeam": 2 }
+    { "unitTypeId": 2, "startX": 5, "startY": 3, "unitTeam": 1 },
+    { "unitTypeId": 3, "startX": 7, "startY": 3, "unitTeam": 1 },
+    { "unitTypeId": 4, "startX": 1, "startY": 3, "unitTeam": 1 },
+    { "unitTypeId": 101, "startX": 7, "startY": 8, "unitTeam": 2 },
+    { "unitTypeId": 101, "startX": 9, "startY": 8, "unitTeam": 2 },
+    { "unitTypeId": 101, "startX": 7, "startY": 12, "unitTeam": 2 },
+    { "unitTypeId": 102, "startX": 9, "startY": 10, "unitTeam": 2 },
+    { "unitTypeId": 102, "startX": 7, "startY": 10, "unitTeam": 2 }
   ]
 }

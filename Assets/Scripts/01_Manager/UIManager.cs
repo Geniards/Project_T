@@ -1,5 +1,7 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -10,12 +12,13 @@ public class UIManager : MonoBehaviour
     public static UIManager Instance { get; private set; }
 
     // 행동 선택 UI
-    public GameObject actionMenu;
-    public Button attackButton; // 공격 버튼
-    public Button waitButton;   // 대기 버튼
-    public Button cancelButton; // 취소 버튼
+    [Header("Action 메뉴 UI")]
+    [SerializeField] private GameObject actionMenu;
+    [SerializeField] private Button attackButton; // 공격 버튼
+    [SerializeField] private Button waitButton;   // 대기 버튼
+    [SerializeField] private Button cancelButton; // 취소 버튼
 
-    // UI 유닛 상태 프리팹
+    [Header("유닛 상태 UI")]
     [SerializeField] private GameObject unitStatusUI;
     [SerializeField] private TMP_Text hpTMP;
     [SerializeField] private TMP_Text manaTMP;
@@ -24,11 +27,36 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TMP_Text levelTMP;
     [SerializeField] private TMP_Text classTMP;
 
+    [Header("유닛 체력바 UI")]
     [SerializeField] private Slider hpSlider;
     [SerializeField] private Slider manaSlider;
     [SerializeField] private Slider expSlider;
 
-    [SerializeField] private CanvasGroup canvasGroup;
+    [SerializeField] private GameObject turnUI;  // 턴 UI
+    [SerializeField] private TMP_Text turnText;  // 턴 텍스트
+
+    [Header("Canvas 설정")]
+    [SerializeField] private CanvasGroup actionMenuCanvasGroup;
+
+    [Header("UI 위치")]
+    [SerializeField] private Vector3 uiPos;
+
+    [Header("게임 목표 UI")]
+    [SerializeField] private GameObject gameObjectivesUI;
+    [SerializeField] private TMP_Text gameObjectVictoryTitleText;
+    [SerializeField] private TMP_Text gameObjectVictoryText;
+    [SerializeField] private TMP_Text gameObjectDefeatTitleText;
+    [SerializeField] private TMP_Text gameObjectDefeatText;
+
+    [Header("승리 UI / 패배 UI")]
+    [SerializeField] private GameObject resultUI;
+    [SerializeField] private Button nextStageButton;
+    [SerializeField] private Button retryButton;
+    [SerializeField] private Button mainMenuButton;
+    [SerializeField] private TMP_Text ResultText;
+
+    [Header("저장 UI")]
+    [SerializeField] private GameObject panel;
 
     // 마지막으로 상태 UI를 표시한 유닛
     private Unit lastHoveredUnit;
@@ -39,6 +67,7 @@ public class UIManager : MonoBehaviour
     // 공격 취소 가능상태
     public bool isAttackMode { get; set; }
 
+    private bool isTurnUIActive = false;
 
     private void Awake()
     {
@@ -50,6 +79,13 @@ public class UIManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        // UI OFF
+        actionMenu.SetActive(false);
+        unitStatusUI.SetActive(false);
+        gameObjectivesUI.SetActive(false);
+        turnUI.SetActive(false);
+        resultUI.SetActive(false);
     }
 
     private void Start()
@@ -57,28 +93,56 @@ public class UIManager : MonoBehaviour
         attackButton.onClick.AddListener(OnAttackButtonClick);
         waitButton.onClick.AddListener(OnWaitButtonClick);
         cancelButton.onClick.AddListener(OnCancelButtonClick);
+
+        nextStageButton.onClick.AddListener(OnNextStageButtonClick);
+        retryButton.onClick.AddListener(OnRetryButtonClick);
+        mainMenuButton.onClick.AddListener(OnMainMenuButtonClick);
     }
 
     /// <summary>
     /// 행동 선택 메뉴 표시
     /// </summary>
     /// <param name="unit"></param>
-    public void ShowActionMenu(Unit unit)
+    public void ShowActionMenu()
     {
-        selectedUnit = unit;
+        if (!selectedUnit) return;
+
         actionMenu.SetActive(true);
         isActionMenuVisible = true;
 
-        // 메뉴 활성화 시 UI 뒤쪽 터치 방지
-        canvasGroup.blocksRaycasts = true;
-        canvasGroup.interactable = true;
+        // UI 뒤쪽 캐릭터 클릭 방지
+        actionMenuCanvasGroup.blocksRaycasts = true;
+        actionMenuCanvasGroup.interactable = true;
 
-        actionMenu.transform.position = unit.transform.position + new Vector3(1f, 0, -1f);
+        AdjustUIPosition(selectedUnit);
+
+        //uiPos = selectedUnit.transform.position + new Vector3(1f, 0, -1f);
+        //actionMenu.transform.position = uiPos;
+    
         // 선택된 유닛을 마지막에 호버된 유닛으과 같다면 StatusUI를 false로
         if (lastHoveredUnit == selectedUnit)
         {
             unitStatusUI.SetActive(false);
         }
+    }
+
+    /// <summary>
+    /// 액션 UI 및 상태 UI 위치 자동 조정
+    /// </summary>
+    private void AdjustUIPosition(Unit selectedUnit)
+    {
+        Vector3 preferredPosition = selectedUnit.transform.position + new Vector3(1f, 0, -1f);
+
+        // 오른쪽에 다른 유닛이 있는지 확인
+        Vector2Int rightPosition = selectedUnit.currentTile.vec2IntPos + Vector2Int.right;
+        Unit rightUnit = UnitManager.Instance.GetUnitAtPosition(rightPosition);
+
+        if (rightUnit != null) // 만약 오른쪽에 유닛이 있다면 UI를 왼쪽으로 배치
+        {
+            preferredPosition = selectedUnit.transform.position + new Vector3(-1f, 0, -1f);
+        }
+
+        actionMenu.transform.position = preferredPosition;
     }
 
     /// <summary>
@@ -89,9 +153,9 @@ public class UIManager : MonoBehaviour
         actionMenu.SetActive(false);
         isActionMenuVisible = false;
 
-        // 메뉴 숨김 시 UI 뒤쪽 터치 허용
-        canvasGroup.blocksRaycasts = false;
-        canvasGroup.interactable = false;
+        // UI 숨길 때 다시 클릭 가능하도록 설정
+        actionMenuCanvasGroup.blocksRaycasts = false;
+        actionMenuCanvasGroup.interactable = false;
     }
 
     public void AfterShowActionMenu()
@@ -118,9 +182,10 @@ public class UIManager : MonoBehaviour
 
     private void OnWaitButtonClick()
     {
-        selectedUnit.unitState = E_UnitState.Complete;
+        selectedUnit.CompleteAction();
         HideActionMenu();
         selectedUnit = null;
+        GameManager.Instance.selectedUnit = selectedUnit;
         TurnManager.Instance.CheckPlayerTurnEnd();
 
     }
@@ -128,6 +193,7 @@ public class UIManager : MonoBehaviour
     private void OnCancelButtonClick()
     {
         selectedUnit.Deselect();
+        selectedUnit = null;
         HideActionMenu();
     }
 
@@ -137,7 +203,7 @@ public class UIManager : MonoBehaviour
 
         isAttackMode = false;
         GridManager.Instance.ClearAttackableTiles();
-        ShowActionMenu(selectedUnit);
+        ShowActionMenu();
     }
 
     public bool IsAttackMode()
@@ -213,5 +279,139 @@ public class UIManager : MonoBehaviour
     {
         if (expSlider)
             expSlider.value = Mathf.Clamp(unit.unitData.exp / unit.unitData.maxExp, 0f, 1f);
+    }
+
+    /// <summary>
+    /// 턴 시작 UI표시
+    /// </summary>
+    /// <param name="isPlayerTurn"></param>
+    /// <param name="turnNumber"></param>
+    /// <returns></returns>
+    public IEnumerator ShowTurnUI(bool isPlayerTurn, int turnNumber)
+    {
+        isTurnUIActive = true;
+        turnUI.SetActive(true);
+
+        if (isPlayerTurn)
+        {
+            turnText.text = $"아군 {turnNumber}턴";
+        }
+        else
+        {
+            turnText.text = $"적군 {turnNumber}턴";
+        }
+
+        yield return new WaitForSeconds(2f);
+
+        turnUI.SetActive(false);
+        isTurnUIActive = false;
+    }
+
+    public bool IsTurnUIActive()
+    {
+        return isTurnUIActive;
+    }
+
+    /// <summary>
+    /// 게임 목표 UI 표시
+    /// </summary>
+    public void ShowGameObjectives()
+    {
+        gameObjectivesUI.SetActive(true);
+        gameObjectVictoryTitleText.text = "승리 조건 :";
+        gameObjectVictoryText.text = "적군을 다 섬멸하라!";
+        gameObjectDefeatTitleText.text = "패배 조건 :";
+        gameObjectDefeatText.text = "아군이 다 죽으면 패배!";
+    }
+
+    /// <summary>
+    /// 게임 목표 UI 숨기기
+    /// </summary>
+    public void HideGameObjectives()
+    {
+        gameObjectivesUI.SetActive(false);
+    }
+
+    public void OnGameStartButtonClick()
+    {
+        HideGameObjectives(); // 게임 목표 UI 닫기
+        GameManager.Instance.StartGame(); // 게임 시작
+    }
+
+    /// <summary>
+    /// 승리 UI 표시
+    /// </summary>
+    public void ShowVictoryUI()
+    {
+        resultUI.SetActive(true);
+        ResultText.text = "전투 승리!";
+    }
+
+    public void HideVictoryUI()
+    {
+        resultUI.SetActive(false);
+    }
+
+    /// <summary>
+    /// 패배 UI 표시
+    /// </summary>
+    public void ShowDefeatUI()
+    {
+        resultUI.SetActive(true);
+        ResultText.text = "전투 패배!";
+    }
+
+    public void HideDefeatUI()
+    {
+        resultUI.SetActive(false);
+    }
+
+    public void ShowGameClearUI()
+    {
+        resultUI.SetActive(true);
+        ResultText.text = "모든 스테이지 클리어!";
+    }
+
+    private void OnNextStageButtonClick()
+    {
+        resultUI.SetActive(false);
+        ResultText.text = "";
+        GameManager.Instance.LoadNextStage();
+    }
+
+    private void OnRetryButtonClick()
+    {
+        resultUI.SetActive(false);
+        ResultText.text = "";
+        GameManager.Instance.RestartStage();
+    }
+
+    private void OnMainMenuButtonClick()
+    {
+        resultUI.SetActive(false);
+        ResultText.text = "";
+        GameManager.Instance.GoToMainMenu();
+    }
+
+    /// <summary>
+    /// 모든 UI 초기화
+    /// </summary>
+    public void ClearAllUI()
+    {
+        HideActionMenu();
+        HideGameObjectives();
+        HideVictoryUI();
+        HideDefeatUI();
+    }
+
+    /// <summary>
+    /// 버튼을 누를 때 패널을 토글
+    /// </summary>
+    public void TogglePanel()
+    {
+        if (panel != null)
+        {
+            panel.SetActive(!panel.activeSelf);
+        }
     }
 }

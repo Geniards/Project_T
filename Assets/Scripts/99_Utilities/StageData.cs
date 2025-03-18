@@ -13,6 +13,7 @@ public class StageData
     public List<TileLegendEntry> tileLegendList;
     public string[] tileMap;
     public string imagePath;
+    public string bgmFileName;
 
     // 유닛 배치 정보
     public List<UnitSpawnData> units;
